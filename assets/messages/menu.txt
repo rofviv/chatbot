@@ -1,0 +1,5 @@
+🤖 *En qué puedo ayudarte?:*
+* 🏍️ Realizar un pedido
+* 🗒️ Ver el menu
+* 🗺️ Consultar el estado de mi pedido
+* ❌ Cancelar mi pedido

@@ -3,7 +3,6 @@ import { EVENTS } from "@builderbot/bot";
 import { config } from "../config";
 import path from "path";
 import fs from "fs";
-import { optionsFlow } from "./options_flow";
 import {
   orderFlow,
   getStatusOrderFlow,
@@ -17,17 +16,21 @@ const promptIntentionDetection = path.join(
   "promt_intention_detection.txt"
 );
 
+const menuPath = path.join(process.cwd(), "assets/messages", "menu.txt");
+
 const promptDetected = fs.readFileSync(promptIntentionDetection, "utf8");
+const menuText = fs.readFileSync(menuPath, "utf8");
 
 export const intentionFlow = createFlowRouting
   .setKeyword(EVENTS.ACTION)
   .setIntentions({
     intentions: [
-      "OPTIONS",
+      "GREETING",
       "CREATE_ORDER",
       "PRODUCTS",
       "STATUS_ORDER",
       "CANCEL_ORDER",
+      "NO_DETECTED",
     ],
     description: promptDetected,
   })
@@ -46,13 +49,14 @@ export const intentionFlow = createFlowRouting
           console.log("Intention detected: ", intention);
 
           if (intention === "NO_DETECTED") {
-            return endFlow(
-              "Lo siento, no pude entender tu mensaje. Por favor, intenta nuevamente."
-            );
+            return endFlow(menuText);
           }
 
-          if (intention === "OPTIONS") {
-            return gotoFlow(optionsFlow);
+          if (intention === "GREETING") {
+            return endFlow(
+              "Hola! soy un bot que te puede ayudar a realizar tus pedidos\n\n" +
+                menuText
+            );
           }
 
           if (intention === "PRODUCTS") {

@@ -1,12 +1,12 @@
-OPTIONS
-Este flujo debe activarse cuando el usuario quiera explorar sus opciones, abrir las opciones para interactuar con el bot. Detecta intenciones relacionadas con la solicitud de opciones o acciones disponibles.
+GREETING
+Este flujo debe activarse cuando el usuario saluda al bot. Detecta intenciones relacionadas con la solicitud de saludar al bot.
 
 Ejemplo de intenciones:
 - Hola
-- Inicio
-- Opciones
+- Buenas
+- Que tal
 Criterio:
-El usuario esta interesado en explorar las opciones disponibles y realizar una accion especifica.
+El usuario esta interesado en saludar al bot.
 
 CREATE_ORDER
 Este flujo debe activarse cuando el usuario quiera crear un pedido. Detecta intenciones relacionadas con la solicitud de crear un pedido.
