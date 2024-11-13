@@ -1,0 +1,52 @@
+OPTIONS
+Este flujo debe activarse cuando el usuario quiera explorar sus opciones, abrir las opciones para interactuar con el bot. Detecta intenciones relacionadas con la solicitud de opciones o acciones disponibles.
+
+Ejemplo de intenciones:
+- Hola
+- Inicio
+- Opciones
+Criterio:
+El usuario esta interesado en explorar las opciones disponibles y realizar una accion especifica.
+
+CREATE_ORDER
+Este flujo debe activarse cuando el usuario quiera crear un pedido. Detecta intenciones relacionadas con la solicitud de crear un pedido.
+
+Ejemplo de intenciones:
+- Quiero crear un pedido
+- Quiero hacer un pedido
+- Quiero ordenar
+- Quiero comprar
+Criterio:
+El usuario esta interesado en crear un pedido y proporcionar detalles del pedido.
+
+PRODUCTS
+Este flujo debe activarse cuando el usuario quiera ver el menu. Detecta intenciones relacionadas con la solicitud de ver el menu.
+
+Ejemplo de intenciones:
+- Menu
+- Cual es el menu?
+- Quiero ver el menu
+- Quiero ver los productos
+- Quiero ver los productos disponibles
+Criterio:
+El usuario esta interesado en ver el menu y consultar los productos disponibles.
+
+STATUS_ORDER
+Este flujo debe activarse cuando el usuario quiera consultar el estado de su pedido. Detecta intenciones relacionadas con la solicitud de consultar el estado de un pedido.
+
+Ejemplo de intenciones:
+- Quiero saber el estado de mi pedido
+- Quiero ver el estado de mi pedido
+- Quiero consultar el estado de mi pedido
+Criterio:
+El usuario esta interesado en consultar el estado de su pedido.
+
+CANCEL_ORDER
+Este flujo debe activarse cuando el usuario quiera cancelar su pedido. Detecta intenciones relacionadas con la solicitud de cancelar un pedido.
+
+Ejemplo de intenciones:
+- Quiero cancelar mi pedido
+- Cancelar mi pedido
+- Ya no quiero mi pedido
+Criterio:
+El usuario esta interesado en cancelar su pedido.

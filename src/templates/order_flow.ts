@@ -11,16 +11,16 @@ const pathPrompt = path.join(
 );
 const prompt = fs.readFileSync(pathPrompt, "utf8");
 
-export const faqFlow = addKeyword(EVENTS.ACTION).addAction(
+export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, endFlow, gotoFlow }) => {
     try {
       const AI = new AIService(config.apiKeyAI);
       const mensajesAnteriores = state.getMyState()?.messages || [];
-      console.log("mensajesAnteriores", mensajesAnteriores);
       const mensajesActuales = [
         ...mensajesAnteriores,
         { role: "user", content: ctx.body },
       ];
+      console.log("mensajes", mensajesActuales);
       const response = await AI.chat(prompt, mensajesActuales);
       state.update({ messages: mensajesActuales });
       return endFlow(response);
@@ -28,5 +28,22 @@ export const faqFlow = addKeyword(EVENTS.ACTION).addAction(
       console.error("Error in faqFlow:", error);
       return endFlow("Por favor, intenta de nuevo");
     }
+  }
+);
+export const productsFlow = addKeyword("2").addAction(
+  async (ctx, { state, endFlow, gotoFlow }) => {
+    return endFlow("Ver el menu");
+  }
+);
+
+export const getStatusOrderFlow = addKeyword("3").addAction(
+  async (ctx, { state, endFlow, gotoFlow }) => {
+    return endFlow("Status de tu pedido");
+  }
+);
+
+export const cancelOrderFlow = addKeyword("4").addAction(
+  async (ctx, { state, endFlow, gotoFlow }) => {
+    return endFlow("Cancelar tu pedido");
   }
 );
