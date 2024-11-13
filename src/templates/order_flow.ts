@@ -30,20 +30,3 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
     }
   }
 );
-export const productsFlow = addKeyword("2").addAction(
-  async (ctx, { state, endFlow, gotoFlow }) => {
-    return endFlow("Ver el menu");
-  }
-);
-
-export const getStatusOrderFlow = addKeyword("3").addAction(
-  async (ctx, { state, endFlow, gotoFlow }) => {
-    return endFlow("Status de tu pedido");
-  }
-);
-
-export const cancelOrderFlow = addKeyword("4").addAction(
-  async (ctx, { state, endFlow, gotoFlow }) => {
-    return endFlow("Cancelar tu pedido");
-  }
-);

@@ -3,12 +3,10 @@ import { EVENTS } from "@builderbot/bot";
 import { config } from "../config";
 import path from "path";
 import fs from "fs";
-import {
-  orderFlow,
-  getStatusOrderFlow,
-  cancelOrderFlow,
-  productsFlow,
-} from "./order_flow";
+import { orderFlow } from "./order_flow";
+import { productsFlow } from "./products_flow";
+import { getStatusOrderFlow } from "./order_status_flow";
+import { cancelOrderFlow } from "./order_cancel_flow";
 
 const promptIntentionDetection = path.join(
   process.cwd(),
@@ -30,6 +28,7 @@ export const intentionFlow = createFlowRouting
       "PRODUCTS",
       "STATUS_ORDER",
       "CANCEL_ORDER",
+      "END_FLOW",
       "NO_DETECTED",
     ],
     description: promptDetected,
@@ -73,6 +72,10 @@ export const intentionFlow = createFlowRouting
 
           if (intention === "CANCEL_ORDER") {
             return gotoFlow(cancelOrderFlow);
+          }
+
+          if (intention === "END_FLOW") {
+            return endFlow("Gracias por usar nuestro servicio");
           }
         } catch (error) {
           console.error("Error in intentionFlow:", error);

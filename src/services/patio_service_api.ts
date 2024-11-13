@@ -1,5 +1,10 @@
 import { config } from "~/config"
 
+type Order = {
+    id: string
+    status: string
+}
+
 class PatioServiceApi {
     private token: string
 
@@ -25,6 +30,20 @@ class PatioServiceApi {
             return null
         } catch (error) {
             console.error('Error in createUser:', error)
+            throw error
+        }
+    }
+
+    async getOrder(orderId: string): Promise<Order> {
+        try {
+            // const response = await axios.get(`${config.patioServiceUrl}/orders/${orderId}`)
+            // return response.data
+            return {
+                id: orderId,
+                status: "pending"
+            }
+        } catch (error) {
+            console.error('Error in getOrder:', error)
             throw error
         }
     }

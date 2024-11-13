@@ -50,3 +50,13 @@ Ejemplo de intenciones:
 - Ya no quiero mi pedido
 Criterio:
 El usuario esta interesado en cancelar su pedido.
+
+END_FLOW
+Este flujo debe activarse cuando el usuario quiera finalizar el flujo. Detecta intenciones relacionadas con la solicitud de finalizar el flujo.
+
+Ejemplo de intenciones:
+- Ya no necesito ayuda
+- Gracias
+- Adios
+Criterio:
+El usuario esta interesado en finalizar el flujo.
