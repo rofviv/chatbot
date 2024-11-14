@@ -1,26 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import PatioServiceApi from "../services/patio_service_api";
 import { intentionFlow } from "./intention_flow";
-
-function parseStatus(status: string) {
-  switch (status) {
-    case "pending":
-      return "pendiente 🕒";
-    case "assigned":
-      return "en camino al comercio 🏍️";
-    case "arrived":
-      return "esperando tu pedido 🍛";
-    case "dispatched":
-      return "en camino a tu ubicación 🏠";
-    case "complete":
-      return "completado ✅";
-    case "canceled":
-      return "cancelado ❌";
-    default:
-      return status;
-  }
-}
-
+import { parseStatus } from "../utils/parse_status";
 export const getStatusOrderFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "Cual es el ID o numero de tu pedido?",
   {

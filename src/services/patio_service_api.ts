@@ -110,6 +110,28 @@ class PatioServiceApi {
       return [];
     }
   }
+
+  async cancelOrder(orderId: number): Promise<boolean> {
+    try {
+      const response = await axios.put(
+        `${config.patioServiceUrl}/api/orders/change-status/${orderId}?isOrder=1`,
+        { status: "canceled", reason: "Canceled by chatbot" },
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error in cancelOrder:", error);
+      return false;
+    }
+  }
 }
 
 export default new PatioServiceApi(config.patioServiceToken);
