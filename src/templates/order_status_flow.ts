@@ -1,25 +1,48 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import PatioServiceApi from "../services/patio_service_api";
-// export const getStatusOrderFlow = addKeyword("3").addAction(
-//   async (ctx, { state, endFlow, gotoFlow }) => {
-//     return endFlow("Status de tu pedido");
-//   }
-// );
+import { intentionFlow } from "./intention_flow";
 
-export const getStatusOrderFlow = addKeyword("3").addAnswer(
+function parseStatus(status: string) {
+  switch (status) {
+    case "pending":
+      return "pendiente 🕒";
+    case "assigned":
+      return "en camino al comercio 🏍️";
+    case "arrived":
+      return "esperando tu pedido 🍛";
+    case "dispatched":
+      return "en camino a tu ubicación 🏠";
+    case "complete":
+      return "completado ✅";
+    case "canceled":
+      return "cancelado ❌";
+    default:
+      return status;
+  }
+}
+
+export const getStatusOrderFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "Cual es el ID o numero de tu pedido?",
   {
     capture: true,
   },
-  async (ctx, { state, flowDynamic, gotoFlow }) => {
-    // TODO: Search order in database
-    const order = await PatioServiceApi.getOrder(ctx.body);
+  async (ctx, { state, flowDynamic, fallBack, gotoFlow }) => {
+    if (ctx.body.toLowerCase() === "salir") {
+      return gotoFlow(intentionFlow);
+    }
+    const orderId = Number(ctx.body);
+    if (isNaN(orderId)) {
+      return fallBack("El ID de pedido debe ser un número, intenta de nuevo");
+    }
+    const order = await PatioServiceApi.getOrder(orderId);
     if (order) {
       return flowDynamic(
-        `El estado de tu pedido #${order.id} es: ${order.status}`
+        `Tu pedido de ${order.store_name} #${order.id} está ${parseStatus(order.status)}`
       );
     } else {
-      return flowDynamic("ID de pedido invalido, intenta de nuevo");
+      return fallBack(
+        "Lo sentimos, no encontramos tu pedido, vuelve a intentarlo con otro ID"
+      );
     }
   }
 );

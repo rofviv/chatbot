@@ -26,6 +26,9 @@ importers:
       '@langchain/openai':
         specifier: ^0.3.13
         version: 0.3.13(@langchain/core@0.3.18(openai@4.67.3(zod@3.23.8)))
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -2930,12 +2933,10 @@ packages:
 
   vectordb@0.1.19:
     resolution: {integrity: sha512-AS73SjteiLFM5qJQ9YwwYORd2vIVDseEq/vZmwZVbCwJAyD7M52uCiZir0cScRRAisovQZFoyvAKwZs2T4gOmw==}
-    cpu: [x64, arm64]
     os: [darwin, linux, win32]
 
   vectordb@0.4.20:
     resolution: {integrity: sha512-A8X5uvNMl7btbKBshaOx0A6R6Q2eQqOE5Ifwu6r1fZALOS+V0rnoQmUKa1K1v31Vcr3S5GvQsFIl+v6yWataqA==}
-    cpu: [x64, arm64]
     os: [darwin, linux, win32]
     peerDependencies:
       '@apache-arrow/ts': ^14.0.2
