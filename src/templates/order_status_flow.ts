@@ -34,10 +34,14 @@ export const getStatusOrderFlow = addKeyword(EVENTS.ACTION).addAnswer(
     if (isNaN(orderId)) {
       return fallBack("El ID de pedido debe ser un número, intenta de nuevo");
     }
+    flowDynamic("Consultando el estado de tu pedido, por favor espera...");
     const order = await PatioServiceApi.getOrder(orderId);
     if (order) {
       return flowDynamic(
-        `Tu pedido de ${order.store_name} #${order.id} está ${parseStatus(order.status)}`
+        `Tu pedido de ${order.store_name} #${order.id} está ${parseStatus(
+          order.status
+        )}`,
+        { delay: 1500 }
       );
     } else {
       return fallBack(
