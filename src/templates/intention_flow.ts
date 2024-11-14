@@ -52,10 +52,7 @@ export const intentionFlow = createFlowRouting
           }
 
           if (intention === "GREETING") {
-            return endFlow(
-              "Hola! soy un bot que te puede ayudar a realizar tus pedidos\n\n" +
-                menuText
-            );
+            return endFlow(menuText);
           }
 
           if (intention === "PRODUCTS") {

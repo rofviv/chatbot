@@ -4,7 +4,7 @@ import { intentionFlow } from "./intention_flow";
 import { parseStatus } from "../utils/parse_status";
 export const cancelOrderFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
-    "Cual es el ID o numero de tu pedido?",
+    "Cual es el ID o numero de tu pedido para cancelarlo?",
     {
       capture: true,
     },
@@ -48,7 +48,7 @@ export const cancelOrderFlow = addKeyword(EVENTS.ACTION)
         const success = await PatioServiceApi.cancelOrder(orderId);
         await flowDynamic("Cancelando tu pedido, por favor espera...");
         if (success) {
-          return endFlow("Pedido cancelado, lamentamos el inconveniente", );
+          return endFlow("Pedido cancelado, lamentamos el inconveniente");
         } else {
           return endFlow(
             "No se pudo cancelar el pedido, por favor comunícate con soporte"
