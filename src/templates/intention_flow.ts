@@ -75,10 +75,7 @@ export const intentionFlow = createFlowRouting
             return endFlow("Gracias por usar nuestro servicio");
           }
 
-          return endFlow(
-            "No se pudo detectar tu intención, vuelve a intentarlo\n\n" +
-              menuText
-          );
+          return endFlow(menuText);
         } catch (error) {
           console.error("Error in intentionFlow:", error);
         }

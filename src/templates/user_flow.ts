@@ -1,7 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "../services/patio_service_api";
 
-const registerFlow = addKeyword(EVENTS.ACTION)
+const registerOldFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
     `Bienvenido a Patio Service, para registrarte necesito que me des algunos datos`
   )
@@ -62,4 +62,4 @@ const registerFlow = addKeyword(EVENTS.ACTION)
 // //   }
 // // );
 
-export { registerFlow };
+export { registerOldFlow };

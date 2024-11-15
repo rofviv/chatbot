@@ -65,25 +65,51 @@ class PatioServiceApi {
     this.token = token;
   }
 
-  async getUser(phone: string): Promise<boolean> {
+  async getUser(phone: string): Promise<User> {
     try {
-      // const response = await axios.get(`${config.patioServiceUrl}/users/${phone}`)
-      // return response.data
-      return false;
+      const response = await axios.get(
+        `${config.patioServiceUrl}/api/customer/profile-by-phone/${phone}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.data.data;
     } catch (error) {
-      console.error("Error in getUser:", error);
-      throw error;
+      return null;
     }
   }
 
-  async createUser(phone: string, name: string, email: string): Promise<void> {
+  async verifyExistsEmail(email: string): Promise<boolean> {
     try {
-      // const response = await axios.post(`${config.patioServiceUrl}/users`, { phone })
-      // return response.data
-      return null;
+      const response = await axios.get(
+        `${config.patioServiceUrl}/api/customer/verify-exists?email=${email}`
+      );
+      if (response.status === 200) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      return true;
+    }
+  }
+
+  async createUser(phone: string, name: string, email: string): Promise<User> {
+    try {
+      const response = await axios.post(
+        `${config.patioServiceUrl}/api/customer`,
+        { phone, name, email, password: "123456", isProfileComplete: 1 }
+      );
+      if (response.status === 200) {
+        return response.data.data;
+      } else {
+        return null;
+      }
     } catch (error) {
       console.error("Error in createUser:", error);
-      throw error;
+      return null;
     }
   }
 
@@ -119,7 +145,6 @@ class PatioServiceApi {
       );
       return response.data.data;
     } catch (error) {
-      console.error("Error in getProducts:", error);
       return [];
     }
   }
@@ -141,24 +166,7 @@ class PatioServiceApi {
         return false;
       }
     } catch (error) {
-      console.error("Error in cancelOrder:", error);
       return false;
-    }
-  }
-
-  async getUserInfo(phone: string): Promise<User> {
-    try {
-      const response = await axios.get(
-        `${config.patioServiceUrl}/api/customer/profile-by-phone/${phone}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error("Error in getUserInfo:", error);
-      return null;
     }
   }
 }
