@@ -1,5 +1,6 @@
 # Image size ~ 400MB
-FROM node:21-alpine3.18 as builder
+# FROM node:21-alpine3.18 as builder
+FROM --platform=linux/x64 node:21-slim as builder
 
 WORKDIR /app
 
@@ -18,7 +19,8 @@ RUN apk add --no-cache --virtual .gyp \
     && pnpm install && pnpm run build \
     && apk del .gyp
 
-FROM node:21-alpine3.18 as deploy
+# FROM node:21-alpine3.18 as deploy
+FROM --platform=linux/x64 node:21-slim as deploy
 
 WORKDIR /app
 
