@@ -4,7 +4,6 @@ import { config } from "../config";
 import path from "path";
 import fs from "fs";
 import { orderFlow } from "./order_flow";
-import { productsFlow } from "./products_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
 
@@ -25,7 +24,6 @@ export const intentionFlow = createFlowRouting
     intentions: [
       "GREETING",
       "CREATE_ORDER",
-      "PRODUCTS",
       "STATUS_ORDER",
       "CANCEL_ORDER",
       "END_FLOW",
@@ -55,10 +53,6 @@ export const intentionFlow = createFlowRouting
             return endFlow(menuText);
           }
 
-          if (intention === "PRODUCTS") {
-            return gotoFlow(productsFlow);
-          }
-
           if (intention === "CREATE_ORDER") {
             return gotoFlow(orderFlow);
           }
@@ -72,7 +66,7 @@ export const intentionFlow = createFlowRouting
           }
 
           if (intention === "END_FLOW") {
-            return endFlow("Gracias por usar nuestro servicio");
+            return endFlow(menuText);
           }
 
           return endFlow(menuText);

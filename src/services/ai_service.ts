@@ -30,4 +30,4 @@ class AIService {
     }
 }
 
-export default AIService
+export default new AIService(config.apiKeyAI);

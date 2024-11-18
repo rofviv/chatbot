@@ -16,20 +16,14 @@ Ejemplo de intenciones:
 - Quiero hacer un pedido
 - Quiero ordenar
 - Quiero comprar
-Criterio:
-El usuario esta interesado en crear un pedido y proporcionar detalles del pedido.
-
-PRODUCTS
-Este flujo debe activarse cuando el usuario quiera ver el menu. Detecta intenciones relacionadas con la solicitud de ver el menu.
-
-Ejemplo de intenciones:
 - Menu
 - Cual es el menu?
 - Quiero ver el menu
 - Quiero ver los productos
 - Quiero ver los productos disponibles
+
 Criterio:
-El usuario esta interesado en ver el menu y consultar los productos disponibles.
+El usuario esta interesado en crear un pedido y proporcionar detalles del pedido.
 
 STATUS_ORDER
 Este flujo debe activarse cuando el usuario quiera consultar el estado de su pedido. Detecta intenciones relacionadas con la solicitud de consultar el estado de un pedido.
