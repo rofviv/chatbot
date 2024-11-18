@@ -80,4 +80,5 @@ EXPOSE 3000
 CMD ["pnpm", "start"]
 
 # sudo docker build -t chatbot-baileys .
+# sudo docker rm -f chatbot-kiky
 # sudo docker run -d -p 7000:3000 --env-file .env --name chatbot-kiky chatbot-baileys
