@@ -20,8 +20,7 @@ const voiceFlow = addKeyword(EVENTS.VOICE_NOTE).addAnswer(
     const text = await handlerAI(ctx);
     console.log(`El usuario dice: ${text}`);
     const mensajesActuales = [{ role: "user", content: text }];
-    const AI = new AIService(config.apiKeyAI);
-    const response = await AI.chat(prompt, mensajesActuales);
+    const response = await AIService.chat(prompt, mensajesActuales);
     // const response = await generateResponse(prompt);
     await ctxFn.flowDynamic(response);
   }
