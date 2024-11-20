@@ -5,14 +5,21 @@ import { registerFlow } from "./register_flow";
 import { orderFlow } from "./order_flow";
 import { merchantDefaultId } from "~/utils/constants";
 
-type currentUser = {
+type CurrentUser = {
   name?: string;
   phone?: string;
   lastOrder?: string;
   lastDate?: Date;
 };
 
-type order = {
+export type LocationGPS = {
+  latitude: number;
+  longitude: number;
+  name: string;
+  address: string;
+};
+
+type Order = {
   id: number;
   status: string;
 };
@@ -29,8 +36,8 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
 
     const phone = ctx.from;
     console.log("Phone", phone);
-    const currentUser = state.get(phone) as currentUser | undefined;
-    const order = state.get("order") as order | undefined;
+    const currentUser = state.get(phone) as CurrentUser | undefined;
+    const order = state.get("order") as Order | undefined;
     if (order) {
       return gotoFlow(orderFlow);
     }

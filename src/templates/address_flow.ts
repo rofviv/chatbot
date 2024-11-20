@@ -1,13 +1,19 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 
-export const addressFlow = addKeyword(EVENTS.LOCATION).addAnswer(
-  "Revisando tu ubicación, por favor espera un momento...",
-  null,
-  async (ctx, { state, endFlow, gotoFlow }) => {
-    const userLatitude = ctx.message.locationMessage.degreesLatitude;
-    const userLongitude = ctx.message.locationMessage.degreesLongitude;
-    return endFlow(
-      `Tu ubicación actual es: Latitud: ${userLatitude}, Longitud: ${userLongitude}`
-    );
+export const addressFlow = addKeyword(EVENTS.LOCATION).addAction(
+  async (ctx, { state, flowDynamic }) => {
+    const latitude = ctx.message.locationMessage.degreesLatitude;
+    const longitude = ctx.message.locationMessage.degreesLongitude;
+    const name = ctx.message.locationMessage.name;
+    const address = ctx.message.locationMessage.address;
+    await state.update({
+      location: {
+        latitude,
+        longitude,
+        name,
+        address,
+      },
+    });
+    return flowDynamic(`Ubicación guardada: ${name} - ${address}`);
   }
 );

@@ -7,6 +7,8 @@ import { intentionFlow } from "./intention_flow";
 import { registerFlow, formRegisterFlow } from "./register_flow";
 import { addressFlow } from "./address_flow";
 import { voiceFlow } from "./voice_flow";
+import { merchantFlow } from "./merchant_flow";
+
 export default createFlow([
   mainFlow,
   registerFlow,
@@ -17,4 +19,5 @@ export default createFlow([
   intentionFlow,
   addressFlow,
   voiceFlow,
+  merchantFlow,
 ]);
