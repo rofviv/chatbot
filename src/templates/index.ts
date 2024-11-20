@@ -6,7 +6,7 @@ import { cancelOrderFlow } from "./order_cancel_flow";
 import { intentionFlow } from "./intention_flow";
 import { registerFlow, formRegisterFlow } from "./register_flow";
 import { addressFlow } from "./address_flow";
-
+import { voiceFlow } from "./voice_flow";
 export default createFlow([
   mainFlow,
   registerFlow,
@@ -16,4 +16,5 @@ export default createFlow([
   cancelOrderFlow,
   intentionFlow,
   addressFlow,
+  voiceFlow,
 ]);
