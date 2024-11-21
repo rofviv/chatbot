@@ -58,6 +58,12 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
       const user = await patioServiceApi.createUser(phone, name, email);
       if (user) {
         endFlow("Gracias por registrarte");
+        await state.update({
+          [phone]: {
+            ...user,
+            lastDate: new Date(),
+          },
+        });
         return gotoFlow(intentionFlow);
       } else {
         return endFlow(

@@ -70,6 +70,9 @@ COPY --from=build /app/assets ./assets
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/pnpm-lock.yaml ./
 
+# Crear directorio tmp y establecer permisos
+RUN mkdir -p /app/tmp && chmod 777 /app/tmp
+
 # Instalar solo dependencias de producción
 RUN corepack enable && \
     corepack prepare pnpm@latest --activate && \
