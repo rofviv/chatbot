@@ -1,67 +1,14 @@
 import { config } from "~/config";
 import axios from "axios";
-
-type Order = {
-  id: string;
-  store_name: string;
-  status: string;
-};
-
-// {"id":198996,"name":"Económico Broasted","description":"Económico Broasted","price":20,"colors":null,"measure":null,"weight":null,"size":null,"photo":"https://i.ibb.co/vzF4dsC/eco-Broasted-pierna.png","status":"online","isOffer":0,"days":"0,1,2,3,4,5,6","merchantId":31970,"commissionPercentage":null,"pickupPercentage":null,"isPoint":0,"stock":null,"order":1,"createdAt":"2024-07-06T17:28:14.000Z","updatedAt":"2024-07-06T17:28:14.000Z","toppings":[{"id":58142,"name":"Cubiertos","order":1,"limit":1,"maxLimit":1,"type":"simple","productId":198996,"createdAt":"2024-07-06T17:28:14.000Z","updatedAt":null,"sub_toppings":[{"id":380321,"name":"Si","order":1,"price":1,"toppingId":58142,"createdAt":"2024-07-06T17:28:14.000Z","updatedAt":null},{"id":380323,"name":"No","order":1,"price":0,"toppingId":58142,"createdAt":"2024-07-06T17:28:14.000Z","updatedAt":null}]},{"id":58143,"name":"Elige Tus Salsas Favoritas","order":1,"limit":1,"maxLimit":3,"type":"multi","productId":198996,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null,"sub_toppings":[{"id":380325,"name":"Salsa De La Casa 50 Gr","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380326,"name":"Salsa De Ají 9 Gr","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380327,"name":"Salsa De Ajo 9 Gr","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380328,"name":"Frejol 100 Ml","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380330,"name":"Escabeche 50 Ml","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380332,"name":"Locoto 50 Ml","order":1,"price":0,"toppingId":58143,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null}]},{"id":58146,"name":"Seleccione Presa Económico Broasted","order":1,"limit":1,"maxLimit":1,"type":"multi","productId":198996,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null,"sub_toppings":[{"id":380334,"name":"Pierna Broasted","order":1,"price":0,"toppingId":58146,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380336,"name":"Contra Pierna Broasted","order":1,"price":0,"toppingId":58146,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null}]},{"id":58147,"name":"Seleccione Presa Extra Broasted","order":1,"limit":0,"maxLimit":4,"type":"multi","productId":198996,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null,"sub_toppings":[{"id":380339,"name":"Presa Extra Pierna 1/8 Broasted","order":1,"price":9,"toppingId":58147,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380341,"name":"Presa Extra Contra Pierna 1/8 Broasted","order":1,"price":9,"toppingId":58147,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380343,"name":"Presa Extra Pecho 1/8 Broasted","order":1,"price":9,"toppingId":58147,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null},{"id":380344,"name":"Presa Extra Ala 1/8 Broasted","order":1,"price":9,"toppingId":58147,"createdAt":"2024-07-06T17:28:15.000Z","updatedAt":null}]}],"merchants_sub_categories":[{"id":134702,"name":"Pollo leña & broasted","merchantId":31970,"subCategoryId":906,"productId":198996,"order":1,"createdAt":"2024-07-06T17:28:14.000Z","updatedAt":"2024-07-06T17:28:14.000Z"}]}
-export type Product = {
-  id: number;
-  name: string;
-  price: number;
-  isOffer: number;
-  toppings: Topping[];
-  merchants_sub_categories: MerchantSubCategory[];
-};
-
-type MerchantSubCategory = {
-  id: number;
-  name: string;
-};
-
-type Topping = {
-  id: number;
-  name: string;
-  limit: number;
-  maxLimit: number;
-  type: string;
-  sub_toppings: SubTopping[];
-};
-
-type SubTopping = {
-  id: number;
-  name: string;
-  price: number;
-  toppingId: number;
-};
-
-// {"id":4553,"name":"Roy","lastname":null,"phone":"59177640286","email":"royvillarroel94@gmail.com","password":"$2b$10$9bSo4Y9O0gmgnwV0rFoDc.LVAczQSDk1FpbHQgvCseefDGnQBhnRq","rating":0,"status":"enabled","wallet":20,"last_login":"2024-03-13T16:11:21.000Z","app_version":null,"device":null,"referred_code":null,"birthday":null,"last_latitude":"0.00000000","last_longitude":"0.00000000","last_sync":null,"role":"customer","city_id":6,"createdAt":"2024-02-02T14:47:09.000Z","updatedAt":"2024-09-24T16:08:36.000Z","timezone_id":1,"order_capacity":0,"photo_url":null,"modality_id":null,"contract_url":null,"signature_url":null,"identity_number":null,"address":null,"extra_amount":0,"payment_option":0,"warranty_amount":0,"bearing":0,"jugno_id":null,"token_notification":null,"otp":965741,"referred_user_id":null,"merchant_id":null,"driver_validate":0,"top_motorcycle":0,"acceptance_rate":1,"type_bonus":0,"is_helper":0,"is_profile_complete":1,"nit":null,"business_name":null,"points":0,"country_code":null,"is_verified_phone":0,"is_verified_email":0,"addresses":[{"id":6,"name":"Adress Test","cityId":1,"address":"Address Test","latitude":-17.798797854405368,"longitude":-63.19796472787857,"coverageId":null,"references":"Address Test"}],"paymentMethods":null,"quantityOrdersActive":0,"notifications":0,"city":{"id":6,"name":"New York","currency":"USD"},"merchant":null}
-type User = {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  quantityOrdersActive: number;
-  points: number;
-  nit: string;
-  business_name: string;
-  status: string;
-};
-
-// {"id":30853,"name":"Burger King - Banzer","latitude":-17.755003769323586,"longitude":-63.17687920114555,"max_distance":12,"coverage_cell_id":"888b221a39fffff","photo":"https://storage-patiodriver.s3.amazonaws.com/1730910511782.png","address":"Av, Cristo Redentor, entre 3er. y 4to. anillo, esquina Manuel Marco, 6RWF+572, Santa Cruz de la Sierra, Bolivia","state":"online","groupChat":"PATIO BURGER KING","externalId":"30853","readyAssignment":0,"phone":"59170516039","orderCapacity":0,"discountTip":0,"timeReady":10,"activateReady":0,"orderType":2,"photoBanner":"https://storage-patiodriver.s3.amazonaws.com/1708875169781.jpg","commissionPercentage":8,"pickupPercentage":0,"isVisible":1,"firstDeliveryId":null,"email":"burgerkingbanzer@patio.com","autoAccept":0,"topPriority":100,"multiplyPoints":1,"paymentCash":1,"paymentQr":0,"motoclickAvailable":0,"coverageId":20,"coverageReportId":12,"clientId":568,"hourStart":null,"hourEnd":null,"hasMenu":1,"logo":"https://storage-patiodriver.s3.amazonaws.com/1708875167362.jpg","zoneId":101,"topCategoryId":1,"sectionId":1,"createdAt":"2027-03-24T10:00:00.000Z","updatedAt":"2024-11-19T11:28:07.000Z"}
-export type Merchant = {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  max_distance: number;
-  paymentCash: number;
-  paymentQr: number;
-  distance_from_client?: number;
-};
+import { UserModel } from "~/models/user";
+import { Order } from "~/models/order";
+import {
+  Product,
+  MerchantSubCategory,
+  Topping,
+  SubTopping,
+} from "~/models/product";
+import { Merchant } from "~/models/merchat";
 
 class PatioServiceApi {
   private token: string;
@@ -70,7 +17,7 @@ class PatioServiceApi {
     this.token = token;
   }
 
-  async getUser(phone: string): Promise<User> {
+  async getUser(phone: string): Promise<UserModel> {
     try {
       const response = await axios.get(
         `${config.patioServiceUrl}/api/customer/profile-by-phone/${phone}`,
@@ -101,7 +48,11 @@ class PatioServiceApi {
     }
   }
 
-  async createUser(phone: string, name: string, email: string): Promise<User> {
+  async createUser(
+    phone: string,
+    name: string,
+    email: string
+  ): Promise<UserModel> {
     try {
       const response = await axios.post(
         `${config.patioServiceUrl}/api/customer`,
@@ -148,32 +99,37 @@ class PatioServiceApi {
           },
         }
       );
-      const products = response.data.data.map((product: any): Product => ({
-        id: product.id,
-        name: product.name,
-        // description: product.description,
-        price: product.price,
-        isOffer: product.isOffer,
-        toppings: product.toppings.map((topping: any): Topping => ({
-          id: topping.id,
-          name: topping.name,
-          limit: topping.limit,
-          maxLimit: topping.maxLimit,
-          type: topping.type,
-          sub_toppings: topping.sub_toppings.map((subTopping: any): SubTopping => ({
-            id: subTopping.id,
-            name: subTopping.name,
-            price: subTopping.price,
-            toppingId: subTopping.toppingId,
-          })),
-        })),
-        merchants_sub_categories: product.merchants_sub_categories.map(
-          (category: any): MerchantSubCategory => ({
-            id: category.id,
-            name: category.name,
-          })
-        ),
-      }));
+      const products = response.data.data.map(
+        (product: any): Product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          isOffer: product.isOffer,
+          toppings: product.toppings.map(
+            (topping: any): Topping => ({
+              id: topping.id,
+              name: topping.name,
+              limit: topping.limit,
+              maxLimit: topping.maxLimit,
+              type: topping.type,
+              sub_toppings: topping.sub_toppings.map(
+                (subTopping: any): SubTopping => ({
+                  id: subTopping.id,
+                  name: subTopping.name,
+                  price: subTopping.price,
+                  toppingId: subTopping.toppingId,
+                })
+              ),
+            })
+          ),
+          merchants_sub_categories: product.merchants_sub_categories.map(
+            (category: any): MerchantSubCategory => ({
+              id: category.id,
+              name: category.name,
+            })
+          ),
+        })
+      );
       return products;
     } catch (error) {
       return [];
@@ -203,20 +159,25 @@ class PatioServiceApi {
 
   async merchantsByClient(clientId: number): Promise<Merchant[]> {
     try {
-      const response = await axios.get(`${config.patioServiceUrl}/api/merchants/client/${clientId}`, {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      });
-      return response.data.data.map((merchant: any): Merchant => ({
-        id: merchant.id,
-        name: merchant.name,
-        latitude: merchant.latitude,
-        longitude: merchant.longitude,
-        max_distance: merchant.max_distance,
-        paymentCash: merchant.paymentCash,
-        paymentQr: merchant.paymentQr,
-      }));
+      const response = await axios.get(
+        `${config.patioServiceUrl}/api/merchants/client/${clientId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.data.data.map(
+        (merchant: any): Merchant => ({
+          id: merchant.id,
+          name: merchant.name,
+          latitude: merchant.latitude,
+          longitude: merchant.longitude,
+          max_distance: merchant.max_distance,
+          paymentCash: merchant.paymentCash,
+          paymentQr: merchant.paymentQr,
+        })
+      );
     } catch (error) {
       return [];
     }

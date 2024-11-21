@@ -4,20 +4,7 @@ import patioServiceApi from "../services/patio_service_api";
 import { registerFlow } from "./register_flow";
 import { orderFlow } from "./order_flow";
 import { merchantDefaultId } from "~/utils/constants";
-
-type CurrentUser = {
-  name?: string;
-  phone?: string;
-  lastOrder?: string;
-  lastDate?: Date;
-};
-
-export type LocationGPS = {
-  latitude: number;
-  longitude: number;
-  name: string;
-  address: string;
-};
+import { getUser } from "~/services/local_storage";
 
 type Order = {
   id: number;
@@ -36,7 +23,7 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
 
     const phone = ctx.from;
     console.log("Phone", phone);
-    const currentUser = state.get(phone) as CurrentUser | undefined;
+    const currentUser = await getUser(state);
     const order = state.get("order") as Order | undefined;
     if (order) {
       return gotoFlow(orderFlow);
@@ -71,7 +58,7 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
       const fiveMinutes = 300000; // 5 minutos en milisegundos
       if (diffTime > fiveMinutes) {
         await flowDynamic(
-          `Hola! ${currentUser.name}, gracias por volver a contactarnos`
+          `Hola! ${currentUser.data?.name}, gracias por volver a contactarnos`
         );
       } else {
         await state.update({
