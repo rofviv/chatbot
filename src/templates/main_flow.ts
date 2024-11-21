@@ -4,53 +4,52 @@ import patioServiceApi from "../services/patio_service_api";
 import { registerFlow } from "./register_flow";
 import { orderFlow } from "./order_flow";
 import { merchantDefaultId } from "~/utils/constants";
-import { getUser } from "~/services/local_storage";
-
-type Order = {
-  id: number;
-  status: string;
-};
+import {
+  getMenuGlobal,
+  getOrderCurrent,
+  getRegisterPosponed,
+  getUser,
+  saveMenuGlobal,
+  saveUser,
+} from "~/services/local_storage";
 
 const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
-
-    const menuGlobal = globalState.get("menuGlobal") as string | undefined;
+    const menuGlobal = await getMenuGlobal(globalState);
     if (!menuGlobal) {
       const menu = await patioServiceApi.getProducts(merchantDefaultId);
       console.log("menuGlobal: ", menu.length);
-      globalState.update({ menuGlobal: JSON.stringify(menu) });
+      saveMenuGlobal(globalState, JSON.stringify(menu));
     }
 
     const phone = ctx.from;
     console.log("Phone", phone);
-    const currentUser = await getUser(state);
-    const order = state.get("order") as Order | undefined;
-    if (order) {
+    const currentOrder = await getOrderCurrent(state);
+    if (currentOrder) {
       return gotoFlow(orderFlow);
     }
+    const currentUser = await getUser(state);
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {
-        const registerPosponed = state.get("registerPosponed") as
-          | boolean
-          | false;
+        const registerPosponed = await getRegisterPosponed(state);
         if (!registerPosponed) {
           return gotoFlow(registerFlow);
         } else {
           return gotoFlow(intentionFlow);
         }
       } else {
-        await state.update({
-          [phone]: {
-            name: userInfo.name,
-            phone,
+        if (userInfo.addresses && userInfo.addresses.length > 0) {
+          //  LOCATION
+        } else {
+          await saveUser(state, {
+            data: userInfo,
+            lastOrder: undefined,
             lastDate: new Date(),
-          },
-        });
-        await flowDynamic(
-          `Hola! ${userInfo.name}, bienvenido de vuelta`
-        );
-        return gotoFlow(intentionFlow);
+          });
+          await flowDynamic(`Hola! ${userInfo.name}, bienvenido de vuelta`);
+          return gotoFlow(intentionFlow);
+        }
       }
     } else {
       const lastDate = currentUser.lastDate;
@@ -61,20 +60,14 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
           `Hola! ${currentUser.data?.name}, gracias por volver a contactarnos`
         );
       } else {
-        await state.update({
-          [phone]: {
-            ...currentUser,
-            lastDate: new Date(),
-          },
+        await saveUser(state, {
+          ...currentUser,
+          lastDate: new Date(),
         });
       }
       return gotoFlow(intentionFlow);
     }
   }
 );
-
-
-
-
 
 export { mainFlow };
