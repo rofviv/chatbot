@@ -9,7 +9,7 @@ import { locationFlow } from "./location_flow";
 import { voiceFlow } from "./voice_flow";
 import { merchantFlow } from "./merchant_flow";
 import { addressFlow } from "./address_flow";
-
+import { empanadaFlow } from "./empanada_flow";
 export default createFlow([
   mainFlow,
   registerFlow,
@@ -22,4 +22,5 @@ export default createFlow([
   voiceFlow,
   merchantFlow,
   addressFlow,
+  empanadaFlow,
 ]);
