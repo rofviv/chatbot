@@ -1,17 +1,19 @@
+import { i18n } from "~/translations";
+
 export function parseStatus(status: string) {
   switch (status) {
     case "pending":
-      return "pendiente 🕒";
+      return i18n.t('status.pending');
     case "assigned":
-      return "en camino al comercio 🏍️";
+      return i18n.t('status.assigned');
     case "arrived":
-      return "esperando tu pedido 🍛";
+      return i18n.t('status.arrived');
     case "dispatched":
-      return "en camino a tu ubicación 🏠";
+      return i18n.t('status.dispatched');
     case "complete":
-      return "completado ✅";
+      return i18n.t('status.complete');
     case "canceled":
-      return "cancelado ❌";
+      return i18n.t('status.canceled');
     default:
       return status;
   }

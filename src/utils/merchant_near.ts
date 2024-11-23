@@ -1,4 +1,4 @@
-import { Merchant } from "../services/patio_service_api";
+import { Merchant } from "~/models/merchat";
 
 export const merchantNear = async (merchants: Merchant[], latitude: number, longitude: number): Promise<Merchant[]> => {
   const merchantsNear = merchants.filter((merchant) => {

@@ -1,10 +1,11 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import AIService from "../services/ai_service";
-import { config } from "../config";
 import path from "path";
-import fs, { stat } from "fs";
+import fs from "fs";
 import { intentionFlow } from "./intention_flow";
 import { productsParseText } from "~/utils/parse_products";
+import { i18n } from "~/translations";
+import { saveOrderCurrent, clearOrderCurrent } from "~/services/local_storage";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -15,22 +16,23 @@ const prompt = fs.readFileSync(pathPrompt, "utf8");
 
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
+    // CONFIGURE INTENTION DETECTION ORDER FLOW
     try {
-      state.update({ order: { id: 1, status: "pending" } });
+      saveOrderCurrent(state, { id: 1, status: "pending" });
       let messages = [
         ...(state.get("messages") || []),
         { role: "user", content: ctx.body },
       ];
       if (
-        ctx.body.toLowerCase() === "salir" ||
-        ctx.body.toLowerCase() === "cancelar"
+        ctx.body.toLowerCase() === i18n.t("hello").toLowerCase() ||
+        ctx.body.toLowerCase() === i18n.t("menu").toLowerCase()
       ) {
-        state.update({ messages: [], order: undefined });
+        clearOrderCurrent(state);
         return gotoFlow(intentionFlow);
       }
       if (ctx.body.toLowerCase() === "finalizar" || ctx.body.toLowerCase() === "realizar mi pedido") {
         // CREATE ORDER
-        state.update({ messages: [], order: undefined });
+        clearOrderCurrent(state);
         return flowDynamic("Creando tu pedido, por favor espera...");
       }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));

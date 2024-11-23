@@ -1,3 +1,4 @@
+import { i18n, Language } from "~/translations";
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "../services/patio_service_api";
@@ -12,6 +13,9 @@ import {
   saveMenuGlobal,
   saveUser,
 } from "~/services/local_storage";
+import { config } from "~/config";
+
+i18n.setLanguage(config.defaultLanguage as Language);
 
 const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
@@ -39,17 +43,13 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
           return gotoFlow(intentionFlow);
         }
       } else {
-        if (userInfo.addresses && userInfo.addresses.length > 0) {
-          //  LOCATION
-        } else {
-          await saveUser(state, {
-            data: userInfo,
-            lastOrder: undefined,
-            lastDate: new Date(),
-          });
-          await flowDynamic(`Hola! ${userInfo.name}, bienvenido de vuelta`);
-          return gotoFlow(intentionFlow);
-        }
+        await saveUser(state, {
+          data: userInfo,
+          lastOrder: undefined,
+          lastDate: new Date(),
+        });
+        await flowDynamic(`Hola! ${userInfo.name}, bienvenido de vuelta`);
+        return gotoFlow(intentionFlow);
       }
     } else {
       const lastDate = currentUser.lastDate;

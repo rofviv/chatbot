@@ -5,9 +5,10 @@ import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
 import { intentionFlow } from "./intention_flow";
 import { registerFlow, formRegisterFlow } from "./register_flow";
-import { addressFlow } from "./address_flow";
+import { locationFlow } from "./location_flow";
 import { voiceFlow } from "./voice_flow";
 import { merchantFlow } from "./merchant_flow";
+import { addressFlow } from "./address_flow";
 
 export default createFlow([
   mainFlow,
@@ -17,7 +18,8 @@ export default createFlow([
   getStatusOrderFlow,
   cancelOrderFlow,
   intentionFlow,
-  addressFlow,
+  locationFlow,
   voiceFlow,
   merchantFlow,
+  addressFlow,
 ]);

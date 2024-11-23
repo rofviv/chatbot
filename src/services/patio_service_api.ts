@@ -9,6 +9,7 @@ import {
   SubTopping,
 } from "~/models/product";
 import { Merchant } from "~/models/merchat";
+import { Coverage } from "~/models/coverage";
 
 class PatioServiceApi {
   private token: string;
@@ -180,6 +181,23 @@ class PatioServiceApi {
       );
     } catch (error) {
       return [];
+    }
+  }
+
+  async getCoverage(latitude: number, longitude: number): Promise<Coverage> {
+    try {
+      const response = await axios.post(
+        `${config.patioServiceUrl}/api/coverages/coordinate`,
+        { latitude, longitude, type: 0 },
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return null;
     }
   }
 }

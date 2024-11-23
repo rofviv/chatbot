@@ -8,4 +8,6 @@ export const config = {
     apiKeyAI: process.env.API_KEY_AI ?? '',
     patioServiceUrl: process.env.PATIO_SERVICE_URL ?? 'http://localhost:3000',
     patioServiceToken: process.env.PATIO_SERVICE_TOKEN ?? 'patio-service-token',
+    // Translation
+    defaultLanguage: process.env.DEFAULT_LANGUAGE ?? 'es'
 }

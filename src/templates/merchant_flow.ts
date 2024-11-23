@@ -1,8 +1,8 @@
 import { addKeyword } from "@builderbot/bot";
 import patioServiceApi from "../services/patio_service_api";
 import { merchantNear } from "../utils/merchant_near";
-import { clientMerchantId } from "../utils/constants";
-import { LocationGPS } from "./main_flow";
+import { clientMerchantId } from "~/utils/constants";
+// import { LocationGPS } from "./main_flow";
 
 export const merchantFlow = addKeyword("merchants").addAction(
   async (ctx, { state, flowDynamic }) => {
@@ -13,10 +13,10 @@ export const merchantFlow = addKeyword("merchants").addAction(
     if (merchants.length === 0) {
       return flowDynamic("No hay comercios disponibles en tu zona");
     }
-    const location = state.get("location") as LocationGPS;
-    const merchantsNear = await merchantNear(merchants, location.latitude, location.longitude);
-    return flowDynamic(
-      merchantsNear.map((merchant) => `${merchant.name} - ${merchant.distance_from_client.toFixed(2)} km`).join("\n")
-    );
+    // const location = state.get("location") as LocationGPS;
+    // const merchantsNear = await merchantNear(merchants, location.latitude, location.longitude);
+    // return flowDynamic(
+    //   merchantsNear.map((merchant) => `${merchant.name} - ${merchant.distance_from_client.toFixed(2)} km`).join("\n")
+    // );
   }
 );

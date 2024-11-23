@@ -1,6 +1,5 @@
 import { BotStateGlobal, BotStateStandAlone } from "@builderbot/bot/dist/types";
-import patioServiceApi from "./patio_service_api";
-import { CurrentUser, UserModel } from "~/models/user";
+import { CurrentUser } from "~/models/user";
 import { CurrentOrder } from "~/models/order";
 
 export const saveUser = async (state: BotStateStandAlone, user: CurrentUser) => {
@@ -30,6 +29,19 @@ export const getOrderCurrent = async (
   state: BotStateStandAlone
 ): Promise<CurrentOrder | undefined> => {
   return state.get("currentOrder") as CurrentOrder | undefined;
+};
+
+export const saveOrderCurrent = async (
+  state: BotStateStandAlone,
+  order: CurrentOrder
+) => {
+  state.update({ currentOrder: order });
+};
+
+export const clearOrderCurrent = async (
+  state: BotStateStandAlone
+) => {
+  state.update({ currentOrder: undefined });
 };
 
 export const getRegisterPosponed = async (
