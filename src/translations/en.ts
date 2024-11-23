@@ -24,5 +24,16 @@ export default {
         register_email_invalid: "The email is not valid, please try again",
         register_email_exists: "The email already exists, please try with another",
         register_saving: "Saving data, please wait..."
+    },
+    address: {
+        address_first: "Before placing your order, I need to know your location",
+        address_share: "Please, share your location GPS (normal location not real time)",
+        address_fallback: "Please, respond with Yes or No"
+    },
+    location: {
+        location_no_merchants: "No merchants available at the moment, try again later",
+        location_no_coverage: "We regret to inform you that we do not have coverage in your location",
+        location_out_coverage: "We regret to inform you that we do not have coverage in your location",
+        location_coverage: "Excellent, we have coverage in your area, what do you want to order?"
     }
 };

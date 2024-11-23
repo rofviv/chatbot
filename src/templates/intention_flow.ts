@@ -7,7 +7,7 @@ import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
 import { getUser } from "~/services/local_storage";
-import { addressFlow } from "./address_flow";
+import { addressFlow, currentAddressFlow } from "./address_flow";
 
 const promptIntentionDetection = path.join(
   process.cwd(),
@@ -43,18 +43,17 @@ export const intentionFlow = createFlowRouting
   })
   .create({
     afterEnd(flow) {
-      return flow.addAction(async (ctx, { state, endFlow, gotoFlow }) => {
+      return flow.addAction(async (ctx, { state, endFlow, gotoFlow, flowDynamic }) => {
         try {
           const intention = await state.get("intention");
           console.log("Intention detected: ", intention);
 
-          if (intention === "GREETING") {
-            return endFlow(menuText);
-          }
-
           if (intention === "CREATE_ORDER" || ctx.body == "1") {
             const currentUser = await getUser(state);
-            if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length > 0) {
+            if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length > 1) {
+              return gotoFlow(currentAddressFlow);
+            } else if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length == 1) {
+              await flowDynamic("Estamos utilizando tu dirección registrada: " + currentUser.data.addresses[0].address);
               return gotoFlow(orderFlow);
             } else {
               return gotoFlow(addressFlow);
@@ -72,6 +71,10 @@ export const intentionFlow = createFlowRouting
 
           if (intention === "CANCEL_ORDER" || ctx.body == "4") {
             return gotoFlow(cancelOrderFlow);
+          }
+
+          if (intention === "GREETING") {
+            return endFlow(menuText);
           }
 
           if (intention === "END_FLOW") {
