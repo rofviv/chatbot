@@ -1,4 +1,4 @@
-import { Product } from "~/services/patio_service_api";
+import { Product } from "~/models/product";
 
 export function productsParseText(products: Product[]) {
   const groupedProducts = products.reduce((acc, product) => {
