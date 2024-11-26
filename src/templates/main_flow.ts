@@ -20,8 +20,6 @@ i18n.setLanguage(config.defaultLanguage as Language);
 
 const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
-    return gotoFlow(empanadaFlow);  
-    // TODO: CHANGE TO EMPANADA MAMA FLOW
     const menuGlobal = await getMenuGlobal(globalState);
     if (!menuGlobal) {
       const menu = await patioServiceApi.getProducts(merchantDefaultId);
