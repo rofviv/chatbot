@@ -14,7 +14,6 @@ import {
   saveUser,
 } from "~/services/local_storage";
 import { config } from "~/config";
-import { empanadaFlow } from "./empanada_flow";
 
 i18n.setLanguage(config.defaultLanguage as Language);
 

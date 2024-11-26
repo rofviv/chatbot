@@ -5,12 +5,14 @@ import { clientMerchantId } from "~/utils/constants";
 import { merchantNear } from "~/utils/merchant_near";
 import { saveMerchantsNearByUser } from "~/services/local_storage";
 import { intentionFlow } from "./intention_flow";
+import { addressFlow } from "./address_flow";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
     const latitude = ctx.message.locationMessage.degreesLatitude;
     const longitude = ctx.message.locationMessage.degreesLongitude;
     const coverage = await patioServiceApi.getCoverage(latitude, longitude);
+    console.log("coverage", coverage);
     if (coverage) {
       if (coverage.acceptOrder === 1) {
         await state.update({
@@ -20,9 +22,11 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         if (merchants.length > 0) {
           const merchantsNear = await merchantNear(merchants, latitude, longitude);
           await saveMerchantsNearByUser(state, merchantsNear);
-          // return flowDynamic(
-          //   merchantsNear.map((merchant) => `${merchant.name} - ${merchant.distance_from_client.toFixed(2)} km`).join("\n")
-          // );
+          console.log("state", state.get("newAddress"));
+          if (state.get("newAddress")) {
+            state.update({ coordinates: { latitude, longitude } });
+            return gotoFlow(addressFlow);
+          }
           await flowDynamic(i18n.t("location.location_coverage"), { delay: 1000 });
           ctx.body = "Quiero ver el menu";
           return gotoFlow(intentionFlow);

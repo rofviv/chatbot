@@ -10,6 +10,7 @@ import {
 } from "~/models/product";
 import { Merchant } from "~/models/merchat";
 import { Coverage } from "~/models/coverage";
+import { CreateAddressDto } from "~/dtos/create_address.dto";
 
 class PatioServiceApi {
   private token: string;
@@ -198,6 +199,23 @@ class PatioServiceApi {
       return response.data.data;
     } catch (error) {
       return null;
+    }
+  }
+
+  async saveAddress(address: CreateAddressDto): Promise<boolean> {
+    try {
+      const response = await axios.post(
+        `${config.patioServiceUrl}/api/address`,
+        address,
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.status === 200;
+    } catch (error) {
+      return false;
     }
   }
 }

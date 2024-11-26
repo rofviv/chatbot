@@ -8,7 +8,7 @@ import { registerFlow, formRegisterFlow } from "./register_flow";
 import { locationFlow } from "./location_flow";
 import { voiceFlow } from "./voice_flow";
 import { merchantFlow } from "./merchant_flow";
-import { addressFlow } from "./address_flow";
+import { addressFlow, confirmAddressFlow, currentAddressFlow, newAddressFlow, newAddressReferencesFlow } from "./address_flow";
 import { empanadaFlow } from "./empanada_flow";
 export default createFlow([
   mainFlow,
@@ -23,4 +23,8 @@ export default createFlow([
   merchantFlow,
   addressFlow,
   empanadaFlow,
+  newAddressFlow,
+  currentAddressFlow,
+  newAddressReferencesFlow,
+  confirmAddressFlow,
 ]);

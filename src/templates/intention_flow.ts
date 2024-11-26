@@ -7,7 +7,7 @@ import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
 import { getUser } from "~/services/local_storage";
-import { addressFlow, currentAddressFlow } from "./address_flow";
+import { addressFlow, confirmAddressFlow, currentAddressFlow } from "./address_flow";
 
 const promptIntentionDetection = path.join(
   process.cwd(),
@@ -53,8 +53,7 @@ export const intentionFlow = createFlowRouting
             if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length > 1) {
               return gotoFlow(currentAddressFlow);
             } else if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length == 1) {
-              await flowDynamic("Estamos utilizando tu dirección registrada: " + currentUser.data.addresses[0].address);
-              return gotoFlow(orderFlow);
+              return gotoFlow(confirmAddressFlow);
             } else {
               return gotoFlow(addressFlow);
             }
