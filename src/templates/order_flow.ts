@@ -36,7 +36,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         return flowDynamic("Creando tu pedido, por favor espera...");
       }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));
-      const newPrompt = prompt + "\nLo que puedes ofrecerle es: " + products;
+      const newPrompt = prompt + "\nEl menu es: " + products;
       const response = await AIService.chat(newPrompt, messages);
       state.update({ messages: [...messages, { role: "assistant", content: response }] });
       console.log("mensajes", messages);
