@@ -11,6 +11,7 @@ export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
     async (ctx, { state, flowDynamic, gotoFlow }) => {
       const currentUser = await getUser(state);
       const address = currentUser.data.addresses[0];
+      await saveAddressCurrent(state, address);
       return flowDynamic([
         `${address.name} - ${address.address}`,
         "Quieres usar esta direccion? Si / No",
@@ -22,6 +23,9 @@ export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
     async (ctx, { state, gotoFlow, fallBack, flowDynamic }) => {
       if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
         ctx.body = "Muestrame el menu";
+        const currentUser = await getUser(state);
+        const address = currentUser.data.addresses[0];
+        await saveAddressCurrent(state, address);
         return gotoFlow(intentionFlow);
       } else if (ctx.body.toLowerCase() === "no") {
         return gotoFlow(addressFlow);
@@ -57,6 +61,7 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
     });
 
     if (address) {
+      await saveAddressCurrent(state, address);
       await state.update({
         coordinates: undefined,
         newAddress: false,

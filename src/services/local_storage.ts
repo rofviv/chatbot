@@ -20,6 +20,19 @@ export const getMenuGlobal = async (
   return globalState.get("menuGlobal") as string | undefined;
 };
 
+export const getMerchantsGlobal = async (
+  globalState: BotStateGlobal
+): Promise<MerchantModel[] | []> => {
+  return globalState.get("merchantsGlobal") as MerchantModel[] | [];
+};
+
+export const saveMerchantsGlobal = async (
+  globalState: BotStateGlobal,
+  merchants: MerchantModel[]
+) => {
+  globalState.update({ merchantsGlobal: merchants });
+};
+
 export const saveMenuGlobal = async (
   globalState: BotStateGlobal,
   menu: string

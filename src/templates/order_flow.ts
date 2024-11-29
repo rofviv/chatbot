@@ -5,7 +5,11 @@ import fs from "fs";
 import { intentionFlow } from "./intention_flow";
 import { parseCategories, productsParseText } from "~/utils/parse_products";
 import { i18n } from "~/translations";
-import { saveOrderCurrent, clearOrderCurrent } from "~/services/local_storage";
+import { saveOrderCurrent, clearOrderCurrent, getAddressCurrent, getMerchantsGlobal, saveMerchantsNearByUser } from "~/services/local_storage";
+import patioServiceApi from "~/services/patio_service_api";
+import { getMerchantsNearByUser } from "~/services/local_storage";
+import { cityId_SC, vehicleTypeId_MOTORCYCLE } from "~/utils/constants";
+import { merchantNear } from "~/utils/merchant_near";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -35,23 +39,43 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       const newPrompt = prompt + "\nEl menu disponible es: " + products;
       const response = await AIService.chat(newPrompt, messages);
       state.update({ messages: [...messages, { role: "assistant", content: response }] });
+      console.log("response", response);
       const responseParse = JSON.parse(response);
-      console.log("responseParse", responseParse.message);
-      console.log("cart", responseParse.cart);
       console.log("is_finish", responseParse.is_finish as boolean);
       console.log("view_menu", responseParse.view_menu as boolean);
-      // console.log("view_photo", responseParse.view_photo as boolean);
-      // if (responseParse.view_photo === "true") {
-      //   // const parseDataToFlow = data.map(item => ({body:`Item: ${item.name}`, media:item.photo}))
-      //   const parseDataToFlow = [{body: "Económico Broasted"}]
-      //   return flowDynamic(parseDataToFlow);
-      // }
+      console.log("view_delivery_cost", responseParse.view_delivery_cost as boolean);
+      if (responseParse.view_delivery_cost === "true") {
+        let merchants = await getMerchantsNearByUser(state);
+        const userAddress = await getAddressCurrent(state);
+        if (!merchants) {
+          const merchantsGlobal = await getMerchantsGlobal(globalState);
+          const merchantsNear = await merchantNear(merchantsGlobal, userAddress.latitude, userAddress.longitude);
+          await saveMerchantsNearByUser(state, merchantsNear);
+          merchants = await getMerchantsNearByUser(state);
+        }
+        await flowDynamic(`Calculando el costo de envío desde ${merchants[0].name} hasta ${userAddress.address}`, {
+          delay: 1000,
+        });
+        const res = await patioServiceApi.getQuote({
+          merchantId: merchants[0].id,
+          fromLatitude: merchants[0].latitude,
+          fromLongitude: merchants[0].longitude,
+          toLatitude: userAddress.latitude,
+          toLongitude: userAddress.longitude,
+          returnRoute: 0,
+          vehicleTypeId: vehicleTypeId_MOTORCYCLE,
+          cityId: cityId_SC,
+        });
+        return flowDynamic(`El costo de envío es de ${res.baseCost} ${res.currency}`, {
+          delay: 1000,
+        });
+      }
       if (responseParse.view_menu === "true") {
-        const messageTest = "Claro, fierilla! Aquí tienes el menú que está para darles esos antojitos. ¿Qué te gustaría pedir hoy? 🍔🥤"
-        responseParse.message = [messageTest, categories];
+        // const messageTest = "Claro, fierilla! Aquí tienes el menú que está para darles esos antojitos. ¿Qué te gustaría pedir hoy? 🍔🥤"
+        responseParse.message = [responseParse.message.body, categories];
         return flowDynamic(responseParse.message);
       }
-      if (responseParse.is_finish === true && responseParse.cart && responseParse.cart.length > 0) {
+      if (responseParse.is_finish === true && responseParse.products && responseParse.products.length > 0) {
         console.log("Pedido finalizado !!!!!!!!!!!!!!!!!!");
         clearOrderCurrent(state);
         return endFlow(responseParse.message.body);

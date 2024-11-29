@@ -4,13 +4,15 @@ import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "../services/patio_service_api";
 import { registerFlow } from "./register_flow";
 import { orderFlow } from "./order_flow";
-import { merchantDefaultId } from "~/utils/constants";
+import { clientMerchantId, merchantDefaultId } from "~/utils/constants";
 import {
   getMenuGlobal,
+  getMerchantsGlobal,
   getOrderCurrent,
   getRegisterPosponed,
   getUser,
   saveMenuGlobal,
+  saveMerchantsGlobal,
   saveUser,
 } from "~/services/local_storage";
 import { config } from "~/config";
@@ -24,6 +26,13 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
       const menu = await patioServiceApi.getProducts(merchantDefaultId);
       console.log("menuGlobal: ", menu.length);
       saveMenuGlobal(globalState, JSON.stringify(menu));
+    }
+
+    const merchantsGlobal = await getMerchantsGlobal(globalState);
+    if (!merchantsGlobal) {
+      const merchants = await patioServiceApi.merchantsByClient(clientMerchantId);
+      console.log("merchantsGlobal: ", merchants.length);
+      saveMerchantsGlobal(globalState, merchants);
     }
 
     const phone = ctx.from;

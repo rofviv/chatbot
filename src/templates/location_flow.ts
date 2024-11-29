@@ -3,12 +3,12 @@ import patioServiceApi from "~/services/patio_service_api";
 import { i18n } from "~/translations";
 import { clientMerchantId } from "~/utils/constants";
 import { merchantNear } from "~/utils/merchant_near";
-import { saveMerchantsNearByUser } from "~/services/local_storage";
+import { getMerchantsGlobal, saveMerchantsNearByUser } from "~/services/local_storage";
 import { intentionFlow } from "./intention_flow";
 import { addressFlow } from "./address_flow";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
-  async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
+  async (ctx, { state, flowDynamic, gotoFlow, endFlow, globalState }) => {
     const latitude = ctx.message.locationMessage.degreesLatitude;
     const longitude = ctx.message.locationMessage.degreesLongitude;
     const coverage = await patioServiceApi.getCoverage(latitude, longitude);
@@ -18,9 +18,10 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         await state.update({
           location: coverage,
         });
-        const merchants = await patioServiceApi.merchantsByClient(clientMerchantId);
-        if (merchants.length > 0) {
-          const merchantsNear = await merchantNear(merchants, latitude, longitude);
+        const merchantsGlobal = await getMerchantsGlobal(globalState);
+        // const merchants = await patioServiceApi.merchantsByClient(clientMerchantId);
+        if (merchantsGlobal.length > 0) {
+          const merchantsNear = await merchantNear(merchantsGlobal, latitude, longitude);
           await saveMerchantsNearByUser(state, merchantsNear);
           console.log("state", state.get("newAddress"));
           if (state.get("newAddress")) {

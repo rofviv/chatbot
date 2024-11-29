@@ -1,6 +1,6 @@
 import { config } from "~/config";
 import axios from "axios";
-import { UserModel } from "~/models/user.model";
+import { AddressUserModel, UserModel } from "~/models/user.model";
 import { OrderModel } from "~/models/order.model";
 import {
   ProductModel,
@@ -206,7 +206,7 @@ class PatioServiceApi {
     }
   }
 
-  async saveAddress(address: CreateAddressDto): Promise<boolean> {
+  async saveAddress(address: CreateAddressDto): Promise<AddressUserModel> {
     try {
       const response = await axios.post(
         `${config.patioServiceUrl}/api/address`,
@@ -217,9 +217,9 @@ class PatioServiceApi {
           },
         }
       );
-      return response.status === 200;
+      return response.data.data;
     } catch (error) {
-      return false;
+      return null;
     }
   }
 
