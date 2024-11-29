@@ -107,6 +107,7 @@ class PatioServiceApi {
         (product: any): ProductModel => ({
           id: product.id,
           name: product.name,
+          photo: product.photo,
           price: product.price,
           isOffer: product.isOffer,
           toppings: product.toppings.map(
@@ -130,6 +131,7 @@ class PatioServiceApi {
             (category: any): MerchantSubCategoryModel => ({
               id: category.id,
               name: category.name,
+              order: category.order,
             })
           ),
         })

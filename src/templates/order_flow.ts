@@ -3,7 +3,7 @@ import AIService from "../services/ai_service";
 import path from "path";
 import fs from "fs";
 import { intentionFlow } from "./intention_flow";
-import { productsParseText } from "~/utils/parse_products";
+import { parseCategories, productsParseText } from "~/utils/parse_products";
 import { i18n } from "~/translations";
 import { saveOrderCurrent, clearOrderCurrent } from "~/services/local_storage";
 
@@ -31,15 +31,34 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         return gotoFlow(intentionFlow);
       }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));
+      const categories = parseCategories(JSON.parse(globalState.get("menuGlobal") as string));
       const newPrompt = prompt + "\nEl menu disponible es: " + products;
       const response = await AIService.chat(newPrompt, messages);
       state.update({ messages: [...messages, { role: "assistant", content: response }] });
       const responseParse = JSON.parse(response);
+      console.log("responseParse", responseParse.message);
       console.log("cart", responseParse.cart);
       console.log("is_finish", responseParse.is_finish as boolean);
-      if ((responseParse.is_finish as boolean) === true && responseParse.cart && responseParse.cart.length > 0) {
+      console.log("view_menu", responseParse.view_menu as boolean);
+      // console.log("view_photo", responseParse.view_photo as boolean);
+      // if (responseParse.view_photo === "true") {
+      //   // const parseDataToFlow = data.map(item => ({body:`Item: ${item.name}`, media:item.photo}))
+      //   const parseDataToFlow = [{body: "Económico Broasted"}]
+      //   return flowDynamic(parseDataToFlow);
+      // }
+      if (responseParse.view_menu === "true") {
+        responseParse.message = [responseParse.message.body, categories];
+        return flowDynamic(responseParse.message);
+      }
+      if (responseParse.is_finish === true && responseParse.cart && responseParse.cart.length > 0) {
         console.log("Pedido finalizado !!!!!!!!!!!!!!!!!!");
         clearOrderCurrent(state);
+        return flowDynamic(responseParse.message.body);
+      }
+      if (responseParse.message.media) {
+        responseParse.message = [{body: responseParse.message.body, media: responseParse.message.media}];
+      } else {
+        responseParse.message = responseParse.message.body;
       }
       return flowDynamic(responseParse.message);
     } catch (error) {

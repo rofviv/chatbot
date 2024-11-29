@@ -3,6 +3,7 @@ export type ProductModel = {
   id: number;
   name: string;
   price: number;
+  photo?: string;
   isOffer: number;
   toppings: ToppingModel[];
   merchants_sub_categories: MerchantSubCategoryModel[];
@@ -11,6 +12,7 @@ export type ProductModel = {
 export type MerchantSubCategoryModel = {
   id: number;
   name: string;
+  order: number;
 };
 
 export type ToppingModel = {
