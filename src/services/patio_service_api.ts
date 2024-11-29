@@ -8,7 +8,7 @@ import {
   ToppingModel,
   SubToppingModel,
 } from "~/models/product.model";
-import { MerchantModel } from "~/models/merchat.model";
+import { MerchantModel } from "~/models/merchant.model";
 import { CoverageModel } from "~/models/coverage.model";
 import { CreateAddressDto } from "~/dtos/create_address.dto";
 import { QuoteDto } from "~/dtos/quote.dto";

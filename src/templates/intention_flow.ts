@@ -60,7 +60,7 @@ export const intentionFlow = createFlowRouting
           }
 
           if (intention === "MENU" || ctx.body == "2") {
-            ctx.body = "Quiero ver el menu";
+            ctx.body = "Muestrame el menu";
             return gotoFlow(orderFlow);
           }
 

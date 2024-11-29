@@ -1,6 +1,6 @@
-import { Product } from "~/models/product";
+import { ProductModel } from "~/models/product.model";
 
-export function productsParseText(products: Product[]) {
+export function productsParseText(products: ProductModel[]) {
   const groupedProducts = products.reduce((acc, product) => {
     const category = product.merchants_sub_categories[0].name;
       if (!acc[category]) {

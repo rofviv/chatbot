@@ -21,7 +21,7 @@ export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
     { capture: true, delay: 1200 },
     async (ctx, { state, gotoFlow, fallBack, flowDynamic }) => {
       if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
-        ctx.body = "Quiero ver el menu";
+        ctx.body = "Muestrame el menu";
         return gotoFlow(intentionFlow);
       } else if (ctx.body.toLowerCase() === "no") {
         return gotoFlow(addressFlow);
@@ -63,7 +63,7 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
         nameAddress: undefined,
       });
       await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
-      ctx.body = "Quiero ver el menu";
+      ctx.body = "Muestrame el menu";
       return gotoFlow(intentionFlow);
     } else {
       return endFlow("ocurrió un error, intenta de nuevo");
@@ -113,7 +113,7 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
         if (address) {
           await saveAddressCurrent(state, address);
           await flowDynamic(`Muy bien, utilizaremos ${address.name}, ya puedes realizar tu pedido`);
-          ctx.body = "Quiero ver el menu";
+          ctx.body = "Muestrame el menu";
           return gotoFlow(intentionFlow);
         } else {
           return fallBack("Numero de direccion no encontrado");

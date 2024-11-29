@@ -1,17 +1,17 @@
 import { BotStateGlobal, BotStateStandAlone } from "@builderbot/bot/dist/types";
-import { CurrentUser } from "~/models/user";
-import { CurrentOrder } from "~/models/order";
-import { Merchant } from "~/models/merchat";
-import { AddressUserModel } from "~/models/user";
+import { CurrentUserModel } from "~/models/user.model";
+import { CurrentOrderModel } from "~/models/order.model";
+import { MerchantModel } from "~/models/merchant.model";
+import { AddressUserModel } from "~/models/user.model";
 
-export const saveUser = async (state: BotStateStandAlone, user: CurrentUser) => {
+export const saveUser = async (state: BotStateStandAlone, user: CurrentUserModel) => {
   await state.update({ user: user });
 };
 
 export const getUser = async (
   state: BotStateStandAlone
-): Promise<CurrentUser | undefined> => {
-  return state.get("user") as CurrentUser | undefined;
+): Promise<CurrentUserModel | undefined> => {
+  return state.get("user") as CurrentUserModel | undefined;
 };
 
 export const getMenuGlobal = async (
@@ -29,13 +29,13 @@ export const saveMenuGlobal = async (
 
 export const getOrderCurrent = async (
   state: BotStateStandAlone
-): Promise<CurrentOrder | undefined> => {
-  return state.get("currentOrder") as CurrentOrder | undefined;
+): Promise<CurrentOrderModel | undefined> => {
+  return state.get("currentOrder") as CurrentOrderModel | undefined;
 };
 
 export const saveOrderCurrent = async (
   state: BotStateStandAlone,
-  order: CurrentOrder
+  order: CurrentOrderModel
 ) => {
   state.update({ currentOrder: order });
 };
@@ -54,15 +54,15 @@ export const getRegisterPosponed = async (
 
 export const saveMerchantsNearByUser = async (
   state: BotStateStandAlone,
-  merchants: Merchant[]
+  merchants: MerchantModel[]
 ) => {
   state.update({ merchantsNear: merchants });
 };
 
 export const getMerchantsNearByUser = async (
   state: BotStateStandAlone
-): Promise<Merchant[] | undefined> => {
-  return state.get("merchantsNear") as Merchant[] | undefined;
+): Promise<MerchantModel[] | undefined> => {
+  return state.get("merchantsNear") as MerchantModel[] | undefined;
 };
 
 export const getAddressCurrent = async (

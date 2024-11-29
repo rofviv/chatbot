@@ -43,4 +43,4 @@ IMPORTANTE: Siempre tus respuestas deben estar en formato JSON, todos los produc
     "is_finish": "true" o "false"
 }
 
-Comience mostrando las categorias de productos que tiene disponible y preguntando al usuario que desea pedir en un mensaje.
+Comience mostrando las categorias del menu que tiene disponible y preguntando al usuario que desea pedir en un mismo mensaje.

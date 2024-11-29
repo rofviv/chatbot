@@ -30,17 +30,18 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         clearOrderCurrent(state);
         return gotoFlow(intentionFlow);
       }
-      if (ctx.body.toLowerCase() === "finalizar" || ctx.body.toLowerCase() === "realizar mi pedido") {
-        // CREATE ORDER
-        clearOrderCurrent(state);
-        return flowDynamic("Creando tu pedido, por favor espera...");
-      }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));
-      const newPrompt = prompt + "\nEl menu es: " + products;
+      const newPrompt = prompt + "\nEl menu disponible es: " + products;
       const response = await AIService.chat(newPrompt, messages);
       state.update({ messages: [...messages, { role: "assistant", content: response }] });
-      console.log("mensajes", messages);
-      return flowDynamic(response);
+      const responseParse = JSON.parse(response);
+      console.log("cart", responseParse.cart);
+      console.log("is_finish", responseParse.is_finish as boolean);
+      if ((responseParse.is_finish as boolean) === true && responseParse.cart && responseParse.cart.length > 0) {
+        console.log("Pedido finalizado !!!!!!!!!!!!!!!!!!");
+        clearOrderCurrent(state);
+      }
+      return flowDynamic(responseParse.message);
     } catch (error) {
       console.error("Error in faqFlow:", error);
       return endFlow("Por favor, intenta de nuevo");

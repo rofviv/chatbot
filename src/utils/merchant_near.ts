@@ -1,6 +1,6 @@
-import { Merchant } from "~/models/merchat";
+import { MerchantModel } from "~/models/merchant.model";
 
-export const merchantNear = async (merchants: Merchant[], latitude: number, longitude: number): Promise<Merchant[]> => {
+export const merchantNear = async (merchants: MerchantModel[], latitude: number, longitude: number): Promise<MerchantModel[]> => {
   const merchantsNear = merchants.filter((merchant) => {
     const distance = calculateDistance(latitude, longitude, merchant.latitude, merchant.longitude);
     merchant.distance_from_client = distance;

@@ -28,7 +28,7 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
             return gotoFlow(addressFlow);
           }
           await flowDynamic(i18n.t("location.location_coverage"), { delay: 1000 });
-          ctx.body = "Quiero ver el menu";
+          ctx.body = "Muestrame el menu";
           return gotoFlow(intentionFlow);
         } else {
           return endFlow(
