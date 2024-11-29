@@ -1,9 +1,9 @@
-export type CurrentOrder = {
+export type CurrentOrderModel = {
   id: number;
   status: string;
 };
 
-export type Order = {
+export type OrderModel = {
   id: string;
   store_name: string;
   status: string;

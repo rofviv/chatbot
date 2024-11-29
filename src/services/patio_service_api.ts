@@ -1,16 +1,18 @@
 import { config } from "~/config";
 import axios from "axios";
-import { UserModel } from "~/models/user";
-import { Order } from "~/models/order";
+import { UserModel } from "~/models/user.model";
+import { OrderModel } from "~/models/order.model";
 import {
-  Product,
-  MerchantSubCategory,
-  Topping,
-  SubTopping,
-} from "~/models/product";
-import { Merchant } from "~/models/merchat";
-import { Coverage } from "~/models/coverage";
+  ProductModel,
+  MerchantSubCategoryModel,
+  ToppingModel,
+  SubToppingModel,
+} from "~/models/product.model";
+import { MerchantModel } from "~/models/merchat.model";
+import { CoverageModel } from "~/models/coverage.model";
 import { CreateAddressDto } from "~/dtos/create_address.dto";
+import { QuoteDto } from "~/dtos/quote.dto";
+import { QuoteModel } from "~/models/quote.model";
 
 class PatioServiceApi {
   private token: string;
@@ -71,7 +73,7 @@ class PatioServiceApi {
     }
   }
 
-  async getOrder(orderId: number): Promise<Order> {
+  async getOrder(orderId: number): Promise<OrderModel> {
     try {
       const response = await axios.get(
         `${config.patioServiceUrl}/api/orders/${orderId}`,
@@ -91,7 +93,7 @@ class PatioServiceApi {
     }
   }
 
-  async getProducts(merchantId: number): Promise<Product[]> {
+  async getProducts(merchantId: number): Promise<ProductModel[]> {
     try {
       const response = await axios.get(
         `${config.patioServiceUrl}/api/product/merchant/${merchantId}`,
@@ -102,20 +104,20 @@ class PatioServiceApi {
         }
       );
       const products = response.data.data.map(
-        (product: any): Product => ({
+        (product: any): ProductModel => ({
           id: product.id,
           name: product.name,
           price: product.price,
           isOffer: product.isOffer,
           toppings: product.toppings.map(
-            (topping: any): Topping => ({
+            (topping: any): ToppingModel => ({
               id: topping.id,
               name: topping.name,
               limit: topping.limit,
               maxLimit: topping.maxLimit,
               type: topping.type,
               sub_toppings: topping.sub_toppings.map(
-                (subTopping: any): SubTopping => ({
+                (subTopping: any): SubToppingModel => ({
                   id: subTopping.id,
                   name: subTopping.name,
                   price: subTopping.price,
@@ -125,7 +127,7 @@ class PatioServiceApi {
             })
           ),
           merchants_sub_categories: product.merchants_sub_categories.map(
-            (category: any): MerchantSubCategory => ({
+            (category: any): MerchantSubCategoryModel => ({
               id: category.id,
               name: category.name,
             })
@@ -159,7 +161,7 @@ class PatioServiceApi {
     }
   }
 
-  async merchantsByClient(clientId: number): Promise<Merchant[]> {
+  async merchantsByClient(clientId: number): Promise<MerchantModel[]> {
     try {
       const response = await axios.get(
         `${config.patioServiceUrl}/api/merchants/client/${clientId}`,
@@ -170,7 +172,7 @@ class PatioServiceApi {
         }
       );
       return response.data.data.map(
-        (merchant: any): Merchant => ({
+        (merchant: any): MerchantModel => ({
           id: merchant.id,
           name: merchant.name,
           latitude: merchant.latitude,
@@ -185,7 +187,7 @@ class PatioServiceApi {
     }
   }
 
-  async getCoverage(latitude: number, longitude: number): Promise<Coverage> {
+  async getCoverage(latitude: number, longitude: number): Promise<CoverageModel> {
     try {
       const response = await axios.post(
         `${config.patioServiceUrl}/api/coverages/coordinate`,
@@ -216,6 +218,23 @@ class PatioServiceApi {
       return response.status === 200;
     } catch (error) {
       return false;
+    }
+  }
+
+  async getQuote(order: QuoteDto): Promise<QuoteModel> {
+    try {
+      const response = await axios.post(
+        `${config.patioServiceUrl}/api/orders/quote`,
+        order,
+        {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return null;
     }
   }
 }
