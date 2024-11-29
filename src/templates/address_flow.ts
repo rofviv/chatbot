@@ -49,29 +49,43 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
   { capture: true, delay: 1200 },
   async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
     const currentUser = await getUser(state);
-    const address = await patioServiceApi.saveAddress({
-      name: state.get("nameAddress"),
-      address: ctx.body, // TODO: get address from coordinates
-      references: ctx.body,
-      latitude: state.get("coordinates").latitude,
-      longitude: state.get("coordinates").longitude,
-      userId: currentUser.data.id,
-      cityId: state.get("location").cityId,
-      coverageId: state.get("location").id,
-    });
-
-    if (address) {
-      await saveAddressCurrent(state, address);
-      await state.update({
-        coordinates: undefined,
-        newAddress: false,
-        nameAddress: undefined,
+    if (currentUser) {
+      const address = await patioServiceApi.saveAddress({
+        name: state.get("nameAddress"),
+        address: ctx.body, // TODO: get address from coordinates
+        references: ctx.body,
+        latitude: state.get("coordinates").latitude,
+        longitude: state.get("coordinates").longitude,
+        userId: currentUser.data.id,
+        cityId: state.get("location").cityId,
+        coverageId: state.get("location").id,
+      });
+      if (address) {
+        await saveAddressCurrent(state, address);
+        await state.update({
+          coordinates: undefined,
+          newAddress: false,
+          nameAddress: undefined,
+        });
+        await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
+        ctx.body = "Muestrame el menu";
+        return gotoFlow(intentionFlow);
+      } else {
+        return endFlow("ocurrió un error, intenta de nuevo");
+      }
+    } else {
+      await saveAddressCurrent(state, {
+        id: 0,
+        name: state.get("nameAddress"),
+        address: ctx.body, // TODO: get address from coordinates
+        references: ctx.body,
+        latitude: state.get("coordinates").latitude,
+        longitude: state.get("coordinates").longitude,
+        coverageId: state.get("location").id,
       });
       await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
       ctx.body = "Muestrame el menu";
       return gotoFlow(intentionFlow);
-    } else {
-      return endFlow("ocurrió un error, intenta de nuevo");
     }
   }
 );

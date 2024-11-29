@@ -36,7 +36,10 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));
       const categories = parseCategories(JSON.parse(globalState.get("menuGlobal") as string));
-      const newPrompt = prompt + "\nEl menu disponible es: " + products;
+      let newPrompt = prompt + "\nEl menu disponible es: " + products;
+      if (state.get("deliveryCost")) {
+        newPrompt += "\nEl costo de envío es de " + state.get("deliveryCost") + " " + (state.get("currency") || "BOB");
+      }
       const response = await AIService.chat(newPrompt, messages);
       state.update({ messages: [...messages, { role: "assistant", content: response }] });
       console.log("response", response);
@@ -45,6 +48,9 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       console.log("view_menu", responseParse.view_menu as boolean);
       console.log("view_delivery_cost", responseParse.view_delivery_cost as boolean);
       if (responseParse.view_delivery_cost === "true") {
+        if (state.get("deliveryCost")) {
+          return flowDynamic(`El costo de envío es de ${state.get("deliveryCost")} ${state.get("currency") || "BOB"}`);
+        }
         let merchants = await getMerchantsNearByUser(state);
         const userAddress = await getAddressCurrent(state);
         if (!merchants) {
@@ -53,9 +59,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           await saveMerchantsNearByUser(state, merchantsNear);
           merchants = await getMerchantsNearByUser(state);
         }
-        await flowDynamic(`Calculando el costo de envío desde ${merchants[0].name} hasta ${userAddress.address}`, {
-          delay: 1000,
-        });
         const res = await patioServiceApi.getQuote({
           merchantId: merchants[0].id,
           fromLatitude: merchants[0].latitude,
@@ -75,9 +78,13 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         responseParse.message = [responseParse.message.body, categories];
         return flowDynamic(responseParse.message);
       }
-      if (responseParse.is_finish === true && responseParse.products && responseParse.products.length > 0) {
+      if (responseParse.is_finish === true) {
         console.log("Pedido finalizado !!!!!!!!!!!!!!!!!!");
         clearOrderCurrent(state);
+        state.update({
+          messages: [],
+          deliveryCost: undefined,
+        });
         return endFlow(responseParse.message.body);
       }
       if (responseParse.message.media) {
