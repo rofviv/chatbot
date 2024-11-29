@@ -47,13 +47,14 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       //   return flowDynamic(parseDataToFlow);
       // }
       if (responseParse.view_menu === "true") {
-        responseParse.message = [responseParse.message.body, categories];
+        const messageTest = "Claro, fierilla! Aquí tienes el menú que está para darles esos antojitos. ¿Qué te gustaría pedir hoy? 🍔🥤"
+        responseParse.message = [messageTest, categories];
         return flowDynamic(responseParse.message);
       }
       if (responseParse.is_finish === true && responseParse.cart && responseParse.cart.length > 0) {
         console.log("Pedido finalizado !!!!!!!!!!!!!!!!!!");
         clearOrderCurrent(state);
-        return flowDynamic(responseParse.message.body);
+        return endFlow(responseParse.message.body);
       }
       if (responseParse.message.media) {
         responseParse.message = [{body: responseParse.message.body, media: responseParse.message.media}];

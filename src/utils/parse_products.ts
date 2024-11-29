@@ -7,7 +7,7 @@ export function productsParseText(products: ProductModel[]) {
         acc[category] = [];
       }
       acc[category].push(
-        `*${product.name} - ${product.price} Bs.* media: ${product.photo}\n${product.toppings
+        `*id: ${product.id} - name: ${product.name} - price: ${product.price} Bs.* media: ${product.photo}\nToppings: ${product.toppings
           .map(
             (topping: any) =>
               topping.name +
