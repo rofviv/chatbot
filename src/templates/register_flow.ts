@@ -1,11 +1,10 @@
 import { EVENTS } from "@builderbot/bot";
 
 import { addKeyword } from "@builderbot/bot";
-import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "../services/patio_service_api";
-import { saveUser } from "~/services/local_storage";
 import { i18n } from "~/translations";
 import { addressFlow } from "./address_flow";
+import LocalStorage from "~/services/local_storage";
 
 
 const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
@@ -18,8 +17,6 @@ const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
       return gotoFlow(formRegisterFlow);
     } else if (ctx.body.toLowerCase() === "no" || ctx.body.toLowerCase() === "no") {
       await state.update({ registerPosponed: true });
-      // endFlow(i18n.t("register.register_posponed"));
-      // return gotoFlow(intentionFlow);
       await state.update({
         onlyAddress: true,
       });
@@ -64,14 +61,11 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
       const email = state.get("email");
       const user = await patioServiceApi.createUser(phone, name, email);
       if (user) {
-        // endFlow(i18n.t("register.success"));
-        await saveUser(state, {
+        await LocalStorage.saveUser(state, {
           data: user,
           lastOrder: undefined,
           lastDate: new Date(),
         });
-        // ctx.body = i18n.t("hello");
-        // return gotoFlow(intentionFlow);
         return gotoFlow(addressFlow);
       } else {
         return endFlow(i18n.t("register.error"));

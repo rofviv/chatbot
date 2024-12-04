@@ -6,14 +6,13 @@ import fs from "fs";
 import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
-import { getAddressCurrent, getRegisterPosponed, getUser } from "~/services/local_storage";
 import {
   addressFlow,
   confirmAddressFlow,
   currentAddressFlow,
 } from "./address_flow";
 import { registerFlow } from "./register_flow";
-
+import LocalStorage from "~/services/local_storage";
 const promptIntentionDetection = path.join(
   process.cwd(),
   "assets/prompts",
@@ -55,13 +54,13 @@ export const intentionFlow = createFlowRouting
             console.log("Intention detected: ", intention);
 
             if (intention === "CREATE_ORDER" || ctx.body == "1") {
-              const currentUser = await getUser(state);
+              const currentUser = await LocalStorage.getUser(state);
               if (!currentUser) {
-                const registerPosponed = await getRegisterPosponed(state);
+                const registerPosponed = await LocalStorage.getRegisterPosponed(state);
                 if (!registerPosponed) {
                   return gotoFlow(registerFlow);
                 } else {
-                  const address = await getAddressCurrent(state);
+                  const address = await LocalStorage.getAddressCurrent(state);
                   if (address) {
                     ctx.body = "Muestrame el menu";
                     return gotoFlow(orderFlow);

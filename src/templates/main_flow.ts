@@ -2,57 +2,42 @@ import { i18n, Language } from "~/translations";
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "../services/patio_service_api";
-import { registerFlow } from "./register_flow";
 import { orderFlow } from "./order_flow";
 import { clientMerchantId, merchantDefaultId } from "~/utils/constants";
-import {
-  getMenuGlobal,
-  getMerchantsGlobal,
-  getOrderCurrent,
-  getRegisterPosponed,
-  getUser,
-  saveMenuGlobal,
-  saveMerchantsGlobal,
-  saveUser,
-} from "~/services/local_storage";
 import { config } from "~/config";
+import LocalStorage from "~/services/local_storage";
 
 i18n.setLanguage(config.defaultLanguage as Language);
 
 const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
-    const menuGlobal = await getMenuGlobal(globalState);
+    const menuGlobal = await LocalStorage.getMenuGlobal(globalState);
     if (!menuGlobal) {
       const menu = await patioServiceApi.getProducts(merchantDefaultId);
       console.log("menuGlobal: ", menu.length);
-      saveMenuGlobal(globalState, JSON.stringify(menu));
+      LocalStorage.saveMenuGlobal(globalState, JSON.stringify(menu));
     }
 
-    const merchantsGlobal = await getMerchantsGlobal(globalState);
+    const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
     if (!merchantsGlobal) {
       const merchants = await patioServiceApi.merchantsByClient(clientMerchantId);
       console.log("merchantsGlobal: ", merchants.length);
-      saveMerchantsGlobal(globalState, merchants);
+      LocalStorage.saveMerchantsGlobal(globalState, merchants);
     }
 
     const phone = ctx.from;
     console.log("Phone", phone);
-    const currentOrder = await getOrderCurrent(state);
+    const currentOrder = await LocalStorage.getOrderCurrent(state);
     if (currentOrder) {
       return gotoFlow(orderFlow);
     }
-    const currentUser = await getUser(state);
+    const currentUser = await LocalStorage.getUser(state);
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {
-        // const registerPosponed = await getRegisterPosponed(state);
-        // if (!registerPosponed) {
-        //   return gotoFlow(registerFlow);
-        // } else {
         return gotoFlow(intentionFlow);
-        // }
       } else {
-        await saveUser(state, {
+        await LocalStorage.saveUser(state, {
           data: userInfo,
           lastOrder: undefined,
           lastDate: new Date(),
@@ -64,7 +49,7 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
       const lastDate = currentUser.lastDate;
       const diffTime = Math.abs(new Date().getTime() - lastDate.getTime());
       const fiveMinutes = 300000; // 5 minutos en milisegundos
-      await saveUser(state, {
+      await LocalStorage.saveUser(state, {
         ...currentUser,
         lastDate: new Date(),
       });

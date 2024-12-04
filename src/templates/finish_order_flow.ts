@@ -1,20 +1,15 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
-import {
-  getAddressCurrent,
-  getMerchantsNearByUser,
-  getUser,
-} from "~/services/local_storage";
-
+import LocalStorage from "~/services/local_storage";
 export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow }) => {
-    const currentUser = await getUser(state);
+    const currentUser = await LocalStorage.getUser(state);
     if (!currentUser) {
       return endFlow("Tienes que registrarte para poder realizar un pedido");
     }
     const products = state.get("products");
-    const currentAddress = await getAddressCurrent(state);
-    const merchants = await getMerchantsNearByUser(state);
+    const currentAddress = await LocalStorage.getAddressCurrent(state);
+    const merchants = await LocalStorage.getMerchantsNearByUser(state);
     const merchant = merchants[0];
 
     const total = products.reduce((acc, product) => acc + product.price, 0);

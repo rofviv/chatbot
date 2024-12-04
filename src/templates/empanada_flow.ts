@@ -2,7 +2,7 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import AIService from "../services/ai_service";
 import path from "path";
 import fs from "fs";
-import { clearOrderCurrent } from "~/services/local_storage";
+
 const pathPrompt = path.join(
   process.cwd(),
   "assets/prompts",

@@ -5,12 +5,11 @@ import fs from "fs";
 import { intentionFlow } from "./intention_flow";
 import { parseCategories, productsParseText } from "~/utils/parse_products";
 import { i18n } from "~/translations";
-import { saveOrderCurrent, clearOrderCurrent, getAddressCurrent, getMerchantsGlobal, saveMerchantsNearByUser } from "~/services/local_storage";
 import patioServiceApi from "~/services/patio_service_api";
-import { getMerchantsNearByUser } from "~/services/local_storage";
 import { cityId_SC, vehicleTypeId_MOTORCYCLE } from "~/utils/constants";
 import { merchantNear } from "~/utils/merchant_near";
 import { finishOrderFlow } from "./finish_order_flow";
+import LocalStorage from "~/services/local_storage";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -29,14 +28,14 @@ const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
     try {
-      saveOrderCurrent(state, { id: 1, status: "pending" });
-      let merchants = await getMerchantsNearByUser(state);
-      const userAddress = await getAddressCurrent(state);
+      LocalStorage.saveOrderCurrent(state, { id: 1, status: "pending" });
+      let merchants = await LocalStorage.getMerchantsNearByUser(state);
+      const userAddress = await LocalStorage.getAddressCurrent(state);
       if (!merchants) {
-        const merchantsGlobal = await getMerchantsGlobal(globalState);
+        const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
         const merchantsNear = await merchantNear(merchantsGlobal, userAddress.latitude, userAddress.longitude);
-        await saveMerchantsNearByUser(state, merchantsNear);
-        merchants = await getMerchantsNearByUser(state);
+        await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+        merchants = await LocalStorage.getMerchantsNearByUser(state);
       }
       let messages = [
         ...(state.get("messages") || []),
@@ -47,7 +46,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         ctx.body.toLowerCase() === i18n.t("menu").toLowerCase() ||
         ctx.body.toLowerCase() === "salir"
       ) {
-        clearOrderCurrent(state);
+        LocalStorage.clearOrderCurrent(state);
         return gotoFlow(intentionFlow);
       }
       const products = productsParseText(JSON.parse(globalState.get("menuGlobal") as string));
@@ -64,14 +63,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         if (state.get("deliveryCost")) {
           return flowDynamic(`El costo de envío es de ${state.get("deliveryCost")} ${state.get("currency") || "BOB"}`);
         }
-        // let merchants = await getMerchantsNearByUser(state);
-        // const userAddress = await getAddressCurrent(state);
-        // if (!merchants) {
-        //   const merchantsGlobal = await getMerchantsGlobal(globalState);
-        //   const merchantsNear = await merchantNear(merchantsGlobal, userAddress.latitude, userAddress.longitude);
-        //   await saveMerchantsNearByUser(state, merchantsNear);
-        //   merchants = await getMerchantsNearByUser(state);
-        // }
         const res = await patioServiceApi.getQuote({
           merchantId: merchants[0].id,
           fromLatitude: merchants[0].latitude,
@@ -100,7 +91,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         const responseFinish = await AIService.chat(newPrompt, messages);
         const responseParse = JSON.parse(responseFinish);
         console.log("products", responseParse.products);
-        clearOrderCurrent(state);
+        LocalStorage.clearOrderCurrent(state);
         state.update({
           messages: [],
           deliveryCost: undefined,
