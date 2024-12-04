@@ -64,7 +64,12 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
       console.log(res);
       // TODO: save order in local storage
       return endFlow(
-        `Pedido realizado: #${res.id} puedes ver el tracking de tu pedido: ${res.deliveryTrackingUrl}`
+`
+¡Tu pedido #${res.id} ha sido confirmado! 🚀 Estamos preparando todo para que llegue a ti lo antes posible.
+
+📍 Puedes rastrear tu pedido en tiempo real haciendo clic en el siguiente enlace:
+${res.deliveryTrackingUrl}
+`
       );
     } catch (error) {
       console.log(error);

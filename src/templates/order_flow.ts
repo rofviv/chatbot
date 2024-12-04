@@ -10,6 +10,8 @@ import MerchantUtils from "~/utils/merchant_near";
 import { finishOrderFlow } from "./finish_order_flow";
 import LocalStorage from "~/services/local_storage";
 import ProductUtils from "~/utils/parse_products";
+import Utils from "~/utils/utils";
+import { AIResponse, AIResponseFinish } from "~/models/ai_flow.model";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -17,6 +19,13 @@ const pathPrompt = path.join(
   "prompt_ai_order.txt"
 );
 const prompt = fs.readFileSync(pathPrompt, "utf8");
+
+const pathPromptFormat = path.join(
+  process.cwd(),
+  "assets/prompts",
+  "prompt_format_order.txt"
+);
+const promptFormat = fs.readFileSync(pathPromptFormat, "utf8");
 
 const pathPromptFinish = path.join(
   process.cwd(),
@@ -69,13 +78,14 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           " " +
           (state.get("currency") || "BOB");
       }
+      newPrompt += "\n" + promptFormat;
       const response = await AIService.chat(newPrompt, messages);
       state.update({
         messages: [...messages, { role: "assistant", content: response }],
       });
       console.log("response", response);
-      const responseParse = JSON.parse(response);
-      if (responseParse.view_delivery_cost === "true") {
+      const responseParse = Utils.fixJSON(response) as AIResponse;
+      if (responseParse.view_delivery_cost) {
         if (state.get("deliveryCost")) {
           return flowDynamic(
             `El costo de envío es de ${state.get("deliveryCost")} ${
@@ -100,16 +110,17 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           }
         );
       }
-      if (responseParse.view_menu === "true") {
+      if (responseParse.view_menu) {
         // const messageTest = "Claro, fierilla! Aquí tienes el menú que está para darles esos antojitos. ¿Qué te gustaría pedir hoy? 🍔🥤"
-        responseParse.message = [responseParse.message.body, categories];
-        return flowDynamic(responseParse.message);
+        // responseParse.message = [responseParse.message.body, categories];
+        // return flowDynamic(responseParse.message);
+        return flowDynamic([responseParse.message.body, categories]);
       }
-      if (responseParse.is_finish === "true") {
-        await flowDynamic("Realizando pedido... Espera un momento por favor");
+      if (responseParse.is_finish) {
+        await flowDynamic("Realizando pedido... un momento por favor");
         messages = [...messages, { role: "system", content: promptFinish }];
         const responseFinish = await AIService.chat(newPrompt, messages);
-        const responseParse = JSON.parse(responseFinish);
+        const responseParse = Utils.fixJSON(responseFinish) as AIResponseFinish;
         console.log("products", responseParse.products);
         LocalStorage.clearOrderCurrent(state);
         state.update({
@@ -119,17 +130,16 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         });
         return gotoFlow(finishOrderFlow);
       }
-      if (responseParse.message.media) {
-        responseParse.message = [
+      let sendMessage: any = responseParse.message.body;
+      if (responseParse.message.media && responseParse.message.media !== "") {
+        sendMessage = [
           {
             body: responseParse.message.body,
             media: responseParse.message.media,
           },
         ];
-      } else {
-        responseParse.message = responseParse.message.body;
       }
-      return flowDynamic(responseParse.message);
+      return flowDynamic(sendMessage);
     } catch (error) {
       console.error("Error in faqFlow:", error);
       return endFlow("Por favor, intenta de nuevo");

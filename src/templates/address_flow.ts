@@ -37,24 +37,24 @@ export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
   );
 
 export const newAddressFlow = addKeyword(EVENTS.ACTION).addAnswer(
-  "Con que nombre deseas guardar esta direccion? ej: Casa, Trabajo, etc",
+  "¿Podrías pasarme tu dirección escrita para ubicarte fácilmente? ej: Calle dechia #282",
   { capture: true, delay: 1200 },
   async (ctx, { state, gotoFlow }) => {
-    await state.update({ nameAddress: ctx.body });
-    return gotoFlow(newAddressReferencesFlow);
+    await state.update({ addressReferences: ctx.body });
+    return gotoFlow(newAddressRegisterFlow);
   }
 );
 
-export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
-  "Puedes darnos alguna referencia para que podamos encontrarte? ej: Puerta, Edificio, Nro Casa, etc",
+export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
+  "Con que nombre quieres guardar esta dirección? ej: Casa, Trabajo, etc",
   { capture: true, delay: 1200 },
   async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
     const currentUser = await LocalStorage.getUser(state);
     if (currentUser) {
       const address = await patioServiceApi.saveAddress({
-        name: state.get("nameAddress"),
-        address: ctx.body, // TODO: get address from coordinates
-        references: ctx.body,
+        name: ctx.body,
+        address: state.get("addressReferences"), // TODO: get address from coordinates
+        references: state.get("addressReferences"),
         latitude: state.get("coordinates").latitude,
         longitude: state.get("coordinates").longitude,
         userId: currentUser.data.id,
@@ -66,7 +66,7 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
         await state.update({
           coordinates: undefined,
           newAddress: false,
-          nameAddress: undefined,
+          addressReferences: undefined,
         });
         await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
         // ctx.body = "Muestrame el menu";
@@ -79,9 +79,9 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
     } else {
       await LocalStorage.saveAddressCurrent(state, {
         id: 0,
-        name: state.get("nameAddress"),
-        address: ctx.body, // TODO: get address from coordinates
-        references: ctx.body,
+        name: ctx.body,
+        address: state.get("addressReferences"), // TODO: get address from coordinates
+        references: state.get("addressReferences"),
         latitude: state.get("coordinates").latitude,
         longitude: state.get("coordinates").longitude,
         coverageId: state.get("location").id,
@@ -153,7 +153,7 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
     const currentUser = await LocalStorage.getUser(state);
     try {
       if (ctx.body == "0") {
-        return gotoFlow(newAddressFlow);
+        return gotoFlow(addressFlow);
       }
       if (!isNaN(parseInt(ctx.body))) {
         const address = currentUser.data.addresses[parseInt(ctx.body) - 1];

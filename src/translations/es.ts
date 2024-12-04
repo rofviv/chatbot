@@ -26,7 +26,7 @@ export default {
         register_saving: "Guardando datos, por favor espere..."
     },
     address: {
-        address_first: "Ahora necesitamos conocer tu ubicación",
+        address_first: "Necesitamos conocer tu ubicación",
         address_first_posponed: "Muy bien, pero lo que no podemos evitar es que necesitamos conocer tu ubicación",
         address_share: "Por favor, envia tu ubicación GPS (ubicación normal no en tiempo real)",
         address_fallback: "Por favor, responde con Si o No"
