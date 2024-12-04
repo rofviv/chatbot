@@ -90,7 +90,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           toLatitude: userAddress.latitude,
           toLongitude: userAddress.longitude,
           returnRoute: 0,
-          vehicleTypeId: Constants.vehicleTypeId_MOTORCYCLE,
+          vehicleTypeId: Constants.vehicleType_motorcycle,
           cityId: Constants.cityId_SC,
         });
         return flowDynamic(

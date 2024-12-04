@@ -1,7 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
 import LocalStorage from "~/services/local_storage";
-
+import Constants from "~/utils/constants";
 
 export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow }) => {
@@ -51,12 +51,13 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
           })),
         })),
         //   comment: "Generate by builderbot",
-        orderProvider: "CHATBOT",
+        orderProvider: Constants.providerName,
         tipOriginal: 0,
         currency: "BOB",
-        vehicleTypeId: 1,
+        vehicleTypeId: Constants.vehicleType_motorcycle,
         storeName: merchant.name,
         isPickup: 0,
+        providerImage: Constants.providerImage,
         //   nit: "",
         //   businessName: "",
       });
