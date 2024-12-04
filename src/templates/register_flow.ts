@@ -1,11 +1,9 @@
 import { EVENTS } from "@builderbot/bot";
-
 import { addKeyword } from "@builderbot/bot";
 import patioServiceApi from "../services/patio_service_api";
 import { i18n } from "~/translations";
 import { addressFlow } from "./address_flow";
 import LocalStorage from "~/services/local_storage";
-
 
 const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
   i18n.t("register.register_welcome"),

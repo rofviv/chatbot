@@ -7,7 +7,7 @@ import { parseCategories, productsParseText } from "~/utils/parse_products";
 import { i18n } from "~/translations";
 import patioServiceApi from "~/services/patio_service_api";
 import { cityId_SC, vehicleTypeId_MOTORCYCLE } from "~/utils/constants";
-import { merchantNear } from "~/utils/merchant_near";
+import Utils from "~/utils/merchant_near";
 import { finishOrderFlow } from "./finish_order_flow";
 import LocalStorage from "~/services/local_storage";
 
@@ -33,7 +33,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       const userAddress = await LocalStorage.getAddressCurrent(state);
       if (!merchants) {
         const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
-        const merchantsNear = await merchantNear(merchantsGlobal, userAddress.latitude, userAddress.longitude);
+        const merchantsNear = await Utils.merchantNear(merchantsGlobal, userAddress.latitude, userAddress.longitude);
         await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
         merchants = await LocalStorage.getMerchantsNearByUser(state);
       }

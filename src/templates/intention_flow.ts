@@ -111,10 +111,6 @@ export const intentionFlow = createFlowRouting
               return endFlow(menuText);
             }
 
-            // if (intention === "NO_DETECTED") {
-            //   return endFlow(menuText);
-            // }
-
             return endFlow(menuText);
           } catch (error) {
             console.error("Error in intentionFlow:", error);

@@ -1,9 +1,9 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
 import { i18n } from "~/translations";
-import { merchantNear } from "~/utils/merchant_near";
 import { addressFlow } from "./address_flow";
 import { orderFlow } from "./order_flow";
+import Utils from "~/utils/merchant_near";
 import LocalStorage from "~/services/local_storage";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
@@ -19,7 +19,7 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         });
         const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
         if (merchantsGlobal.length > 0) {
-          const merchantsNear = await merchantNear(merchantsGlobal, latitude, longitude);
+          const merchantsNear = await Utils.merchantNear(merchantsGlobal, latitude, longitude);
           await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
           console.log("state", state.get("newAddress"));
           if (state.get("newAddress")) {
