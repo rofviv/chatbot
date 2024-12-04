@@ -3,7 +3,7 @@ import patioServiceApi from "~/services/patio_service_api";
 import { i18n } from "~/translations";
 import { addressFlow } from "./address_flow";
 import { orderFlow } from "./order_flow";
-import Utils from "~/utils/merchant_near";
+import MerchantUtils from "~/utils/merchant_near";
 import LocalStorage from "~/services/local_storage";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
@@ -17,31 +17,33 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         await state.update({
           location: coverage,
         });
-        const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
+        const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
+          globalState
+        );
         if (merchantsGlobal.length > 0) {
-          const merchantsNear = await Utils.merchantNear(merchantsGlobal, latitude, longitude);
+          const merchantsNear = await MerchantUtils.merchantNear(
+            merchantsGlobal,
+            latitude,
+            longitude
+          );
           await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
           console.log("state", state.get("newAddress"));
           if (state.get("newAddress")) {
             state.update({ coordinates: { latitude, longitude } });
             return gotoFlow(addressFlow);
           }
-          await flowDynamic(i18n.t("location.location_coverage"), { delay: 1000 });
+          await flowDynamic(i18n.t("location.location_coverage"), {
+            delay: 1000,
+          });
           ctx.body = "Muestrame el menu";
           return gotoFlow(orderFlow);
         } else {
-          return endFlow(
-            i18n.t("location.location_no_merchants")
-          );
+          return endFlow(i18n.t("location.location_no_merchants"));
         }
       } else {
-        return endFlow(
-          i18n.t("location.location_no_coverage")
-        );
+        return endFlow(i18n.t("location.location_no_coverage"));
       }
     }
-    return endFlow(
-      i18n.t("location.location_out_coverage")
-    );
+    return endFlow(i18n.t("location.location_out_coverage"));
   }
 );

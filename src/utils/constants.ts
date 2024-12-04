@@ -1,4 +1,6 @@
-export const merchantDefaultId = 31970;
-export const clientMerchantId = 3536;
-export const vehicleTypeId_MOTORCYCLE = 2;
-export const cityId_SC = 1;
+export default class Constants {
+  static merchantDefaultId = 31970;
+  static clientMerchantId = 3536;
+  static vehicleTypeId_MOTORCYCLE = 2;
+  static cityId_SC = 1;
+}

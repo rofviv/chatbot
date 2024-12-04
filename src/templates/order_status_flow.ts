@@ -1,7 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import PatioServiceApi from "../services/patio_service_api";
 import { intentionFlow } from "./intention_flow";
-import { parseStatus } from "../utils/parse_status";
+import OrderUtils from "~/utils/parse_status";
 
 
 export const getStatusOrderFlow = addKeyword(EVENTS.ACTION).addAnswer(
@@ -21,7 +21,7 @@ export const getStatusOrderFlow = addKeyword(EVENTS.ACTION).addAnswer(
     const order = await PatioServiceApi.getOrder(orderId);
     if (order) {
       return flowDynamic(
-        `Tu pedido de ${order.store_name} #${order.id} está ${parseStatus(
+        `Tu pedido de ${order.store_name} #${order.id} está ${OrderUtils.parseStatus(
           order.status
         )}`,
         { delay: 1500 }

@@ -3,9 +3,9 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "../services/patio_service_api";
 import { orderFlow } from "./order_flow";
-import { clientMerchantId, merchantDefaultId } from "~/utils/constants";
 import { config } from "~/config";
 import LocalStorage from "~/services/local_storage";
+import Constants from "~/utils/constants";
 
 i18n.setLanguage(config.defaultLanguage as Language);
 
@@ -13,14 +13,14 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
     const menuGlobal = await LocalStorage.getMenuGlobal(globalState);
     if (!menuGlobal) {
-      const menu = await patioServiceApi.getProducts(merchantDefaultId);
+      const menu = await patioServiceApi.getProducts(Constants.merchantDefaultId);
       console.log("menuGlobal: ", menu.length);
       LocalStorage.saveMenuGlobal(globalState, JSON.stringify(menu));
     }
 
     const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
     if (!merchantsGlobal) {
-      const merchants = await patioServiceApi.merchantsByClient(clientMerchantId);
+      const merchants = await patioServiceApi.merchantsByClient(Constants.clientMerchantId);
       console.log("merchantsGlobal: ", merchants.length);
       LocalStorage.saveMerchantsGlobal(globalState, merchants);
     }

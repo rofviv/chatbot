@@ -1,7 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import PatioServiceApi from "../services/patio_service_api";
 import { intentionFlow } from "./intention_flow";
-import { parseStatus } from "../utils/parse_status";
+import OrderUtils from "~/utils/parse_status";
 
 export const cancelOrderFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
@@ -27,7 +27,7 @@ export const cancelOrderFlow = addKeyword(EVENTS.ACTION)
           return endFlow("Tu pedido ya fue completado, no se puede cancelar");
         }
         await flowDynamic(
-          `Tu pedido tiene el estado: ${parseStatus(
+          `Tu pedido tiene el estado: ${OrderUtils.parseStatus(
             order.status
           )}, deseas cancelarlo? Si/No`
         );
