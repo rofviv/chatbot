@@ -2,6 +2,7 @@
 export type MerchantModel = {
   id: number;
   name: string;
+  address: string;
   latitude: number;
   longitude: number;
   max_distance: number;

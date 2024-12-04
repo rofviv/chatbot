@@ -5,6 +5,8 @@ export type CurrentOrderModel = {
 
 export type OrderModel = {
   id: string;
-  store_name: string;
+  store_name?: string;
+  storeName?: string;
   status: string;
+  deliveryTrackingUrl: string;
 };

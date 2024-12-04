@@ -1,4 +1,4 @@
-import { ProductModel } from "~/models/product.model";
+import { ProductModel, SubToppingModel, ToppingModel } from "~/models/product.model";
 
 export function productsParseText(products: ProductModel[]) {
   const groupedProducts = products.reduce((acc, product) => {
@@ -7,15 +7,15 @@ export function productsParseText(products: ProductModel[]) {
         acc[category] = [];
       }
       acc[category].push(
-        `*id: ${product.id} - name: ${product.name} - price: ${product.price} Bs.* media: ${product.photo}\nToppings: ${product.toppings
+        `id: ${product.id} - name: ${product.name} - price: ${product.price} - media: ${product.photo}\nToppings: ${product.toppings
           .map(
-            (topping: any) =>
-              topping.name +
+            (topping: ToppingModel) =>
+              "toppingId: " + topping.id + " - toppingName: " + topping.name + " - minLimit: " + topping.limit + " - maxLimit: " + topping.maxLimit +
               (topping.sub_toppings
                 ? `\n${topping.sub_toppings
                     .map(
-                      (subTopping: any) =>
-                        subTopping.name + " - " + subTopping.price + " Bs."
+                      (subTopping: SubToppingModel) =>
+                        "subToppingId: " + subTopping.id + " - subToppingName: " + subTopping.name + " - subToppingPrice: " + subTopping.price
                     )
                     .join("\n")}`
                 : "")

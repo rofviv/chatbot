@@ -45,12 +45,12 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {
-        const registerPosponed = await getRegisterPosponed(state);
-        if (!registerPosponed) {
-          return gotoFlow(registerFlow);
-        } else {
-          return gotoFlow(intentionFlow);
-        }
+        // const registerPosponed = await getRegisterPosponed(state);
+        // if (!registerPosponed) {
+        //   return gotoFlow(registerFlow);
+        // } else {
+        return gotoFlow(intentionFlow);
+        // }
       } else {
         await saveUser(state, {
           data: userInfo,
@@ -64,15 +64,14 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
       const lastDate = currentUser.lastDate;
       const diffTime = Math.abs(new Date().getTime() - lastDate.getTime());
       const fiveMinutes = 300000; // 5 minutos en milisegundos
+      await saveUser(state, {
+        ...currentUser,
+        lastDate: new Date(),
+      });
       if (diffTime > fiveMinutes) {
         await flowDynamic(
           `Hola! ${currentUser.data?.name}, gracias por volver a contactarnos`
         );
-      } else {
-        await saveUser(state, {
-          ...currentUser,
-          lastDate: new Date(),
-        });
       }
       return gotoFlow(intentionFlow);
     }

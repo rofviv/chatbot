@@ -13,10 +13,10 @@ export default {
         canceled: "cancelado ❌"
     },
     register: {
-        register_welcome: "Hola! Bienvenido, eres nuevo por aqui, quieres registrarte? Solo te tomará 1 minuto. Si/No",
+        register_welcome: "Para realizar un pedido debemos tener tu cuenta registrada. ¿Quieres registrarte ahora? Solo te tomará 1 minuto. Si/No",
         success: "Gracias por registrarte",
         error: "Hubo un error al registrar, por favor intenta más tarde o comunícate con soporte",
-        register_posponed: "No hay problema, lo haremos despues",
+        register_posponed: "Muy bien, te registraremos despues",
         register_fallback: "Por favor, responde con Si o No",
         register_accept: "Perfecto, voy a proceder a hacerte algunas preguntas",
         register_name: "Primero, cual es tu nombre?",
@@ -26,7 +26,8 @@ export default {
         register_saving: "Guardando datos, por favor espere..."
     },
     address: {
-        address_first: "Antes de realizar tu pedido, necesito conocer tu ubicación",
+        address_first: "Ahora necesitamos conocer tu ubicación",
+        address_first_posponed: "Muy bien, pero lo que no podemos evitar es que necesitamos conocer tu ubicación",
         address_share: "Por favor, envia tu ubicación GPS (ubicación normal no en tiempo real)",
         address_fallback: "Por favor, responde con Si o No"
     },

@@ -6,6 +6,7 @@ import { merchantNear } from "~/utils/merchant_near";
 import { getMerchantsGlobal, saveMerchantsNearByUser } from "~/services/local_storage";
 import { intentionFlow } from "./intention_flow";
 import { addressFlow } from "./address_flow";
+import { orderFlow } from "./order_flow";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow, globalState }) => {
@@ -29,8 +30,10 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
             return gotoFlow(addressFlow);
           }
           await flowDynamic(i18n.t("location.location_coverage"), { delay: 1000 });
+          // ctx.body = "Muestrame el menu";
+          // return gotoFlow(intentionFlow);
           ctx.body = "Muestrame el menu";
-          return gotoFlow(intentionFlow);
+          return gotoFlow(orderFlow);
         } else {
           return endFlow(
             i18n.t("location.location_no_merchants")

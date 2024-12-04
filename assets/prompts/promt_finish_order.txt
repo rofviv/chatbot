@@ -1,0 +1,20 @@
+El usuario finalizó su pedido, Ahora tu tarea es armar el pedido de toda la conversación en formato JSON:
+{
+    "products": [
+        {
+            "quantity": 1, // cantidad del producto nuevo agregado
+            "productId": 1, // id del producto nuevo agregado
+            "price": 0, // precio del producto nuevo agregado
+            "name": "nombre del producto nuevo agregado",
+            "toppings": [
+                {
+                    "toppingId": 1, // id del topping nuevo agregado
+                    "toppingName": "nombre del topping nuevo agregado",
+                    "subToppingId": 1, // id del subTopping nuevo agregado
+                    "subToppingName": "nombre del subTopping nuevo agregado",
+                    "price": 0 // precio del topping nuevo agregado
+                }
+            ]
+        }
+    ]
+}

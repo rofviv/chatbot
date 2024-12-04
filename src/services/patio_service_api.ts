@@ -13,6 +13,7 @@ import { CoverageModel } from "~/models/coverage.model";
 import { CreateAddressDto } from "~/dtos/create_address.dto";
 import { QuoteDto } from "~/dtos/quote.dto";
 import { QuoteModel } from "~/models/quote.model";
+import { CreateOrderDto } from "~/dtos/create_order.dto";
 
 class PatioServiceApi {
   private token: string;
@@ -182,6 +183,7 @@ class PatioServiceApi {
           max_distance: merchant.max_distance,
           paymentCash: merchant.paymentCash,
           paymentQr: merchant.paymentQr,
+          address: merchant.address,
         })
       );
     } catch (error) {
@@ -231,6 +233,23 @@ class PatioServiceApi {
         {
           headers: {
             Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async createOrder(dto: CreateOrderDto): Promise<OrderModel> {
+    try {
+      const response = await axios.post(
+        `${config.patioServiceUrl}/api/orders`,
+        dto,
+        {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
           },
         }
       );

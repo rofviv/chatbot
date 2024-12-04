@@ -1,8 +1,9 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { i18n } from "~/translations";
-import { getUser, saveAddressCurrent } from "~/services/local_storage";
+import { getRegisterPosponed, getUser, saveAddressCurrent } from "~/services/local_storage";
 import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "~/services/patio_service_api";
+import { orderFlow } from "./order_flow";
 
 export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
   .addAnswer(
@@ -68,8 +69,10 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
           nameAddress: undefined,
         });
         await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
+        // ctx.body = "Muestrame el menu";
+        // return gotoFlow(intentionFlow);
         ctx.body = "Muestrame el menu";
-        return gotoFlow(intentionFlow);
+        return gotoFlow(orderFlow);
       } else {
         return endFlow("ocurrió un error, intenta de nuevo");
       }
@@ -84,23 +87,48 @@ export const newAddressReferencesFlow = addKeyword(EVENTS.ACTION).addAnswer(
         coverageId: state.get("location").id,
       });
       await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
+      // ctx.body = "Muestrame el menu";
+      // return gotoFlow(intentionFlow);
       ctx.body = "Muestrame el menu";
-      return gotoFlow(intentionFlow);
+      return gotoFlow(orderFlow);
     }
   }
 );
 
 export const addressFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
-    console.log("coordinates", state.get("coordinates"));
     if (!state.get("coordinates")) {
       await state.update({ newAddress: true });
-      await flowDynamic(i18n.t("address.address_first"));
+      const registerPosponed = await getRegisterPosponed(state);
+      if (registerPosponed) {
+        await flowDynamic(i18n.t("address.address_first_posponed"));
+      } else {
+        await flowDynamic(i18n.t("address.address_first"));
+      }
       return endFlow(i18n.t("address.address_share"));
     } else {
-      return gotoFlow(newAddressFlow);
+      if (state.get("onlyAddress")) {
+        state.update({
+          onlyAddress: undefined,
+        });
+        await saveAddressCurrent(state, {
+          id: 0,
+          name: "Ubicación actual",
+          address: "Ubicación actual",
+          references: "Ubicación actual",
+          latitude: state.get("coordinates").latitude,
+          longitude: state.get("coordinates").longitude,
+          coverageId: state.get("location").id,
+        });
+        await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
+        // ctx.body = "Muestrame el menu";
+        // return gotoFlow(intentionFlow);
+        ctx.body = "Muestrame el menu";
+        return gotoFlow(orderFlow);
+      } else {
+        return gotoFlow(newAddressFlow);
+      }
     }
-    // return gotoFlow(locationFlow);
   }
 );
 
@@ -132,8 +160,10 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
         if (address) {
           await saveAddressCurrent(state, address);
           await flowDynamic(`Muy bien, utilizaremos ${address.name}, ya puedes realizar tu pedido`);
+          // ctx.body = "Muestrame el menu";
+          // return gotoFlow(intentionFlow);
           ctx.body = "Muestrame el menu";
-          return gotoFlow(intentionFlow);
+          return gotoFlow(orderFlow);
         } else {
           return fallBack("Numero de direccion no encontrado");
         }

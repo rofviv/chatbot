@@ -6,8 +6,13 @@ import fs from "fs";
 import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
-import { getUser } from "~/services/local_storage";
-import { addressFlow, confirmAddressFlow, currentAddressFlow } from "./address_flow";
+import { getAddressCurrent, getRegisterPosponed, getUser } from "~/services/local_storage";
+import {
+  addressFlow,
+  confirmAddressFlow,
+  currentAddressFlow,
+} from "./address_flow";
+import { registerFlow } from "./register_flow";
 
 const promptIntentionDetection = path.join(
   process.cwd(),
@@ -43,51 +48,79 @@ export const intentionFlow = createFlowRouting
   })
   .create({
     afterEnd(flow) {
-      return flow.addAction(async (ctx, { state, endFlow, gotoFlow, flowDynamic }) => {
-        try {
-          const intention = await state.get("intention");
-          console.log("Intention detected: ", intention);
+      return flow.addAction(
+        async (ctx, { state, endFlow, gotoFlow, flowDynamic }) => {
+          try {
+            const intention = await state.get("intention");
+            console.log("Intention detected: ", intention);
 
-          if (intention === "CREATE_ORDER" || ctx.body == "1") {
-            const currentUser = await getUser(state);
-            if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length > 1) {
-              return gotoFlow(currentAddressFlow);
-            } else if (currentUser && currentUser.data.addresses && currentUser.data.addresses.length == 1) {
-              return gotoFlow(confirmAddressFlow);
-            } else {
-              return gotoFlow(addressFlow);
+            if (intention === "CREATE_ORDER" || ctx.body == "1") {
+              const currentUser = await getUser(state);
+              if (!currentUser) {
+                const registerPosponed = await getRegisterPosponed(state);
+                if (!registerPosponed) {
+                  return gotoFlow(registerFlow);
+                } else {
+                  const address = await getAddressCurrent(state);
+                  if (address) {
+                    ctx.body = "Muestrame el menu";
+                    return gotoFlow(orderFlow);
+                  } else {
+                    await state.update({
+                      onlyAddress: true,
+                    });
+                    return gotoFlow(addressFlow);
+                  }
+                }
+              } else {
+                if (
+                  currentUser &&
+                  currentUser.data.addresses &&
+                  currentUser.data.addresses.length > 1
+                ) {
+                  return gotoFlow(currentAddressFlow);
+                } else if (
+                  currentUser &&
+                  currentUser.data.addresses &&
+                  currentUser.data.addresses.length == 1
+                ) {
+                  return gotoFlow(confirmAddressFlow);
+                } else {
+                  return gotoFlow(addressFlow);
+                }
+              }
             }
-          }
 
-          if (intention === "MENU" || ctx.body == "2") {
-            ctx.body = "Muestrame el menu";
-            return gotoFlow(orderFlow);
-          }
+            if (intention === "MENU" || ctx.body == "2") {
+              ctx.body = "Muestrame el menu";
+              return gotoFlow(orderFlow);
+            }
 
-          if (intention === "STATUS_ORDER" || ctx.body == "3") {
-            return gotoFlow(getStatusOrderFlow);
-          }
+            if (intention === "STATUS_ORDER" || ctx.body == "3") {
+              return gotoFlow(getStatusOrderFlow);
+            }
 
-          if (intention === "CANCEL_ORDER" || ctx.body == "4") {
-            return gotoFlow(cancelOrderFlow);
-          }
+            if (intention === "CANCEL_ORDER" || ctx.body == "4") {
+              return gotoFlow(cancelOrderFlow);
+            }
 
-          if (intention === "GREETING") {
+            if (intention === "GREETING") {
+              return endFlow(menuText);
+            }
+
+            if (intention === "END_FLOW") {
+              return endFlow(menuText);
+            }
+
+            // if (intention === "NO_DETECTED") {
+            //   return endFlow(menuText);
+            // }
+
             return endFlow(menuText);
+          } catch (error) {
+            console.error("Error in intentionFlow:", error);
           }
-
-          if (intention === "END_FLOW") {
-            return endFlow(menuText);
-          }
-
-          // if (intention === "NO_DETECTED") {
-          //   return endFlow(menuText);
-          // }
-
-          return endFlow(menuText);
-        } catch (error) {
-          console.error("Error in intentionFlow:", error);
         }
-      });
+      );
     },
   });
