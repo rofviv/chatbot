@@ -65,7 +65,7 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
       // TODO: save order in local storage
       return endFlow(
 `
-¡Tu pedido #${res.id} ha sido confirmado! 🚀 Estamos preparando todo para que llegue a ti lo antes posible.
+¡Tu pedido *#${res.id}* ha sido confirmado! 🚀 Estamos preparando todo para que llegue a ti lo antes posible.
 
 📍 Puedes rastrear tu pedido en tiempo real haciendo clic en el siguiente enlace:
 ${res.deliveryTrackingUrl}
