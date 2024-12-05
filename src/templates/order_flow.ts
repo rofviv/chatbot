@@ -37,7 +37,10 @@ const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
     try {
-      LocalStorage.saveOrderCurrent(state, { id: 1, status: "pending" });
+      await LocalStorage.saveOrderCurrent(state, {
+        id: 1,
+        status: "pending",
+      });
       let merchants = await LocalStorage.getMerchantsNearByUser(state);
       const userAddress = await LocalStorage.getAddressCurrent(state);
       if (!merchants) {
@@ -64,13 +67,13 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         LocalStorage.clearOrderCurrent(state);
         return gotoFlow(intentionFlow);
       }
-      const products = ProductUtils.productsParseText(
+      const menuProducts = ProductUtils.productsParseText(
         JSON.parse(globalState.get("menuGlobal") as string)
       );
       const categories = ProductUtils.parseCategories(
         JSON.parse(globalState.get("menuGlobal") as string)
       );
-      let newPrompt = prompt + "\nEl menu es: " + products;
+      let newPrompt = prompt + "\nEl menu es: " + menuProducts;
       if (state.get("deliveryCost")) {
         newPrompt +=
           "\nEl costo de envío es de " +
@@ -83,8 +86,8 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       state.update({
         messages: [...messages, { role: "assistant", content: response }],
       });
-      console.log("response", response);
       const responseParse = Utils.fixJSON(response) as AIResponse;
+      console.log("response", responseParse);
       if (responseParse.view_delivery_cost) {
         if (state.get("deliveryCost")) {
           return flowDynamic(
@@ -111,9 +114,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         );
       }
       if (responseParse.view_menu) {
-        // const messageTest = "Claro, fierilla! Aquí tienes el menú que está para darles esos antojitos. ¿Qué te gustaría pedir hoy? 🍔🥤"
-        // responseParse.message = [responseParse.message.body, categories];
-        // return flowDynamic(responseParse.message);
         return flowDynamic([responseParse.message.body, categories]);
       }
       if (responseParse.is_finish) {

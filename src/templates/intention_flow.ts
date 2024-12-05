@@ -75,15 +75,29 @@ export const intentionFlow = createFlowRouting
                 if (
                   currentUser &&
                   currentUser.data.addresses &&
-                  currentUser.data.addresses.length > 1
+                  currentUser.data.addresses.length > 0
                 ) {
-                  return gotoFlow(currentAddressFlow);
-                } else if (
-                  currentUser &&
-                  currentUser.data.addresses &&
-                  currentUser.data.addresses.length == 1
-                ) {
-                  return gotoFlow(confirmAddressFlow);
+                  const currentAddress = await LocalStorage.getAddressCurrent(state);
+                  if (!currentAddress) {
+                    await state.update({
+                      verifyAddress: true,
+                    });
+                    await LocalStorage.saveAddressCurrent(
+                      state,
+                      currentUser.data.addresses[0],
+                    );
+                  } else {
+                    const currentDate = new Date();
+                    const addressDate = currentAddress.date;
+                    const diffDays = Math.floor((currentDate.getTime() - addressDate.getTime()) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays > 7) {
+                      await state.update({
+                        verifyAddress: true,
+                      });
+                    }
+                  }
+                  return gotoFlow(orderFlow);
                 } else {
                   return gotoFlow(addressFlow);
                 }

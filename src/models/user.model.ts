@@ -20,11 +20,12 @@ export type UserModel = {
 };
 
 export type AddressUserModel = {
-  id: number;
-  name?: string;
+  id?: number;
+  name: string;
   address: string;
+  references: string;
   latitude: number;
   longitude: number;
-  coverageId?: number;
-  references?: string;
+  coverageId: number;
+  date?: Date;
 };

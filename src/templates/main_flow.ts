@@ -28,8 +28,15 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     const phone = ctx.from;
     console.log("Phone", phone);
     const currentOrder = await LocalStorage.getOrderCurrent(state);
-    if (currentOrder) {
+    console.log("currentOrder: ", currentOrder);
+    if (currentOrder && currentOrder.date && currentOrder.date.getTime() > new Date().getTime() - 3600000) {
       return gotoFlow(orderFlow);
+    } else {
+      await LocalStorage.clearOrderCurrent(state);
+      state.update({
+        messages: [],
+        deliveryCost: undefined,
+      });
     }
     const currentUser = await LocalStorage.getUser(state);
     if (!currentUser) {

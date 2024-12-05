@@ -6,4 +6,5 @@ export default class Constants {
   static cityId_SC = 1;
   static providerImage =
     "https://storage-patiodriver.s3.amazonaws.com/holapatio-logo.webp";
+  static delayMessage = 1200;
 }

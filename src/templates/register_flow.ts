@@ -4,13 +4,17 @@ import patioServiceApi from "../services/patio_service_api";
 import { i18n } from "~/translations";
 import { addressFlow } from "./address_flow";
 import LocalStorage from "~/services/local_storage";
+import Constants from "~/utils/constants";
+import { orderFlow } from "./order_flow";
+import { finishOrderFlow } from "./finish_order_flow";
 
 const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
   i18n.t("register.register_welcome"),
   {
     capture: true,
+    delay: Constants.delayMessage,
   },
-  async (ctx, { state, endFlow, gotoFlow, fallBack }) => {
+  async (ctx, { state, gotoFlow, fallBack }) => {
     if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
       return gotoFlow(formRegisterFlow);
     } else if (ctx.body.toLowerCase() === "no" || ctx.body.toLowerCase() === "no") {
@@ -26,18 +30,27 @@ const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
 );
 
 const formRegisterFlow = addKeyword(EVENTS.ACTION)
-  .addAnswer(i18n.t("register.register_accept"))
+  // .addAnswer(i18n.t("register.register_accept"), { delay: Constants.delayMessage })
+  .addAction(
+    async (ctx, { state, flowDynamic }) => {
+      const products = await state.get("products");
+      if (products) {
+        return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
+      }
+      return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
+    }
+  )
   .addAnswer(
     i18n.t("register.register_name"),
-    { capture: true, delay: 1500 },
+    { capture: true, delay: Constants.delayMessage },
     async (ctx, { state, flowDynamic }) => {
       await state.update({ name: ctx.body });
-      return flowDynamic("Perfecto " + ctx.body);
+      return flowDynamic("Perfecto " + ctx.body, { delay: Constants.delayMessage });
     }
   )
   .addAnswer(
     i18n.t("register.register_email"),
-    { capture: true, delay: 2000 },
+    { capture: true, delay: Constants.delayMessage },
     async (ctx, { state, fallBack }) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(ctx.body)) {
@@ -52,7 +65,7 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
   )
   .addAnswer(
     i18n.t("register.register_saving"),
-    { delay: 1500 },
+    { delay: Constants.delayMessage, },
     async (ctx, { state, endFlow, gotoFlow }) => {
       const phone = ctx.from;
       const name = state.get("name");
@@ -64,7 +77,18 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
           lastOrder: undefined,
           lastDate: new Date(),
         });
-        return gotoFlow(addressFlow);
+        const currentAddress = await LocalStorage.getAddressCurrent(state);
+        if (!currentAddress) {
+          return gotoFlow(addressFlow);
+        } else {
+          const products = await state.get("products");
+          if (products) {
+            return gotoFlow(finishOrderFlow);
+          } else {
+            ctx.body = "Muestrame el menu";
+            return gotoFlow(orderFlow);
+          }
+        }
       } else {
         return endFlow(i18n.t("register.error"));
       }

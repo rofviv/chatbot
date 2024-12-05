@@ -5,13 +5,13 @@ import { addressFlow } from "./address_flow";
 import { orderFlow } from "./order_flow";
 import MerchantUtils from "~/utils/merchant_near";
 import LocalStorage from "~/services/local_storage";
+import Constants from "~/utils/constants";
 
 export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow, globalState }) => {
     const latitude = ctx.message.locationMessage.degreesLatitude;
     const longitude = ctx.message.locationMessage.degreesLongitude;
     const coverage = await patioServiceApi.getCoverage(latitude, longitude);
-    console.log("coverage", coverage);
     if (coverage) {
       if (coverage.acceptOrder === 1) {
         await state.update({
@@ -27,13 +27,12 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
             longitude
           );
           await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-          console.log("state", state.get("newAddress"));
           if (state.get("newAddress")) {
             state.update({ coordinates: { latitude, longitude } });
             return gotoFlow(addressFlow);
           }
           await flowDynamic(i18n.t("location.location_coverage"), {
-            delay: 1000,
+            delay: Constants.delayMessage,
           });
           ctx.body = "Muestrame el menu";
           return gotoFlow(orderFlow);

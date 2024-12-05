@@ -2,14 +2,34 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
 import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
+import { confirmAddressFlow, currentAddressFlow, newAddressFlow } from "./address_flow";
+import { formRegisterFlow } from "./register_flow";
 
 export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
-  async (ctx, { state, flowDynamic, endFlow }) => {
+  async (ctx, { state, gotoFlow, endFlow }) => {
     const currentUser = await LocalStorage.getUser(state);
     if (!currentUser) {
-      return endFlow("Tienes que registrarte para poder realizar un pedido");
+      return gotoFlow(formRegisterFlow);
     }
-    const products = state.get("products");
+    const verifyAddress = await state.get("verifyAddress");
+    if (verifyAddress) {
+      if (
+        currentUser &&
+        currentUser.data.addresses &&
+        currentUser.data.addresses.length > 1
+      ) {
+        return gotoFlow(currentAddressFlow);
+      } else if (
+        currentUser &&
+        currentUser.data.addresses &&
+        currentUser.data.addresses.length == 1
+      ) {
+        return gotoFlow(confirmAddressFlow);
+      } else {
+        return gotoFlow(newAddressFlow);
+      }
+    }
+    const products = await state.get("products");
     const currentAddress = await LocalStorage.getAddressCurrent(state);
     const merchants = await LocalStorage.getMerchantsNearByUser(state);
     const merchant = merchants[0];

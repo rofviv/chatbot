@@ -1,6 +1,7 @@
 export type CurrentOrderModel = {
   id: number;
   status: string;
+  date?: Date;
 };
 
 export type OrderModel = {
