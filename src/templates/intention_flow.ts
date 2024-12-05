@@ -6,11 +6,7 @@ import fs from "fs";
 import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
-import {
-  addressFlow,
-  confirmAddressFlow,
-  currentAddressFlow,
-} from "./address_flow";
+import { addressFlow } from "./address_flow";
 import { registerFlow } from "./register_flow";
 import LocalStorage from "~/services/local_storage";
 const promptIntentionDetection = path.join(
@@ -48,7 +44,7 @@ export const intentionFlow = createFlowRouting
   .create({
     afterEnd(flow) {
       return flow.addAction(
-        async (ctx, { state, endFlow, gotoFlow, flowDynamic }) => {
+        async (ctx, { state, endFlow, gotoFlow }) => {
           try {
             const intention = await state.get("intention");
             console.log("Intention detected: ", intention);
@@ -79,24 +75,14 @@ export const intentionFlow = createFlowRouting
                 ) {
                   const currentAddress = await LocalStorage.getAddressCurrent(state);
                   if (!currentAddress) {
-                    await state.update({
-                      verifyAddress: true,
-                    });
                     await LocalStorage.saveAddressCurrent(
                       state,
                       currentUser.data.addresses[0],
                     );
-                  } else {
-                    const currentDate = new Date();
-                    const addressDate = currentAddress.date;
-                    const diffDays = Math.floor((currentDate.getTime() - addressDate.getTime()) / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays > 7) {
-                      await state.update({
-                        verifyAddress: true,
-                      });
-                    }
                   }
+                  await state.update({
+                    verifyAddress: true,
+                  });
                   return gotoFlow(orderFlow);
                 } else {
                   return gotoFlow(addressFlow);

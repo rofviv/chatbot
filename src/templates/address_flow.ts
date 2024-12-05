@@ -50,16 +50,6 @@ export const newAddressFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "¿Podrías pasarme tu dirección escrita para ubicarte fácilmente? ej: Calle dechia #282",
   { capture: true, delay: Constants.delayMessage },
   async (ctx, { state, gotoFlow }) => {
-    const products = await state.get("products");
-    if (products) {
-      const currentAddress = await LocalStorage.getAddressCurrent(state);
-      await LocalStorage.saveAddressCurrent(state, {
-        ...currentAddress,
-        address: ctx.body,
-        references: ctx.body,
-      });
-      return gotoFlow(finishOrderFlow);
-    }
     await state.update({ addressReferences: ctx.body });
     return gotoFlow(newAddressRegisterFlow);
   }
@@ -68,7 +58,7 @@ export const newAddressFlow = addKeyword(EVENTS.ACTION).addAnswer(
 export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "Con que nombre quieres guardar esta dirección? ej: Casa, Trabajo, etc",
   { capture: true, delay: Constants.delayMessage },
-  async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
+  async (ctx, { state, flowDynamic, gotoFlow }) => {
     const currentUser = await LocalStorage.getUser(state);
     const currentAddress: AddressUserModel = {
       name: ctx.body,
@@ -86,6 +76,12 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
           ...currentAddress,
           cityId: state.get("location").cityId,
           userId: currentUser.data.id,
+        });
+        const userInfo = await patioServiceApi.getUser(ctx.from);
+        await LocalStorage.saveUser(state, {
+          data: userInfo,
+          lastOrder: undefined,
+          lastDate: new Date(),
         });
       } catch (error) {
         //
