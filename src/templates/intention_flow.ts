@@ -92,7 +92,15 @@ export const intentionFlow = createFlowRouting
 
             if (intention === "MENU" || ctx.body == "2") {
               ctx.body = "Muestrame el menu";
-              return gotoFlow(orderFlow);
+              const userAddress = await LocalStorage.getAddressCurrent(state);
+              if (userAddress) {
+                return gotoFlow(orderFlow);
+              } else {
+                await state.update({
+                  onlyAddress: true,
+                });
+                return gotoFlow(addressFlow);
+              }
             }
 
             if (intention === "STATUS_ORDER" || ctx.body == "3") {

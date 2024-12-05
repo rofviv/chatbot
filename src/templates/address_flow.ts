@@ -120,7 +120,7 @@ export const addressFlow = addKeyword(EVENTS.ACTION).addAction(
           longitude: state.get("coordinates").longitude,
           coverageId: state.get("location").id,
         });
-        await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
+        // await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
         // ctx.body = "Muestrame el menu";
         // return gotoFlow(intentionFlow);
         ctx.body = "Muestrame el menu";
