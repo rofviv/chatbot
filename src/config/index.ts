@@ -9,5 +9,6 @@ export const config = {
     patioServiceUrl: process.env.PATIO_SERVICE_URL ?? 'http://localhost:3000',
     patioServiceToken: process.env.PATIO_SERVICE_TOKEN ?? 'patio-service-token',
     // Translation
-    defaultLanguage: process.env.DEFAULT_LANGUAGE ?? 'es'
+    defaultLanguage: process.env.DEFAULT_LANGUAGE ?? 'es',
+    domain: process.env.DOMAIN ?? 'chatbot.patiodelivery.com'
 }

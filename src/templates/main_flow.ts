@@ -6,6 +6,7 @@ import { orderFlow } from "./order_flow";
 import { config } from "~/config";
 import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
+import { formRegisterFlow } from "./register_flow";
 
 i18n.setLanguage(config.defaultLanguage as Language);
 
@@ -42,7 +43,8 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {
-        return gotoFlow(intentionFlow);
+        // return gotoFlow(intentionFlow);
+        return gotoFlow(formRegisterFlow);
       } else {
         await LocalStorage.saveUser(state, {
           data: userInfo,
@@ -55,12 +57,12 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     } else {
       const lastDate = currentUser.lastDate;
       const diffTime = Math.abs(new Date().getTime() - lastDate.getTime());
-      const fiveMinutes = 300000; // 5 minutos en milisegundos
+      const unDia = 86400000; // 1 día en milisegundos
       await LocalStorage.saveUser(state, {
         ...currentUser,
         lastDate: new Date(),
       });
-      if (diffTime > fiveMinutes) {
+      if (diffTime > unDia) {
         await flowDynamic(
           `Hola! ${currentUser.data?.name}, gracias por volver a contactarnos`
         );

@@ -7,37 +7,46 @@ import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
 import { orderFlow } from "./order_flow";
 import { finishOrderFlow } from "./finish_order_flow";
+import { config } from "~/config";
 
-const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
-  i18n.t("register.register_welcome"),
-  {
-    capture: true,
-    delay: Constants.delayMessage,
-  },
-  async (ctx, { state, gotoFlow, fallBack }) => {
-    if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
-      return gotoFlow(formRegisterFlow);
-    } else if (ctx.body.toLowerCase() === "no" || ctx.body.toLowerCase() === "no") {
-      await state.update({ registerPosponed: true });
-      await state.update({
-        onlyAddress: true,
-      });
-      return gotoFlow(addressFlow);
-    } else {
-      return fallBack(i18n.t("register.register_fallback"));
-    }
-  }
-);
+import path from "path";
+import fs from "fs";
+
+const menuPath = path.join(process.cwd(), "assets/messages", "menu.txt");
+const menuText = fs.readFileSync(menuPath, "utf8");
+
+// const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
+//   i18n.t("register.register_welcome"),
+//   {
+//     capture: true,
+//     delay: Constants.delayMessage,
+//   },
+//   async (ctx, { state, gotoFlow, fallBack }) => {
+//     if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
+//       return gotoFlow(formRegisterFlow);
+//     } else if (ctx.body.toLowerCase() === "no" || ctx.body.toLowerCase() === "no") {
+//       await state.update({ registerPosponed: true });
+//       await state.update({
+//         onlyAddress: true,
+//       });
+//       return gotoFlow(addressFlow);
+//     } else {
+//       return fallBack(i18n.t("register.register_fallback"));
+//     }
+//   }
+// );
 
 const formRegisterFlow = addKeyword(EVENTS.ACTION)
   // .addAnswer(i18n.t("register.register_accept"), { delay: Constants.delayMessage })
   .addAction(
     async (ctx, { state, flowDynamic }) => {
-      const products = await state.get("products");
-      if (products) {
-        return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
-      }
-      return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
+      // const products = await state.get("products");
+      // if (products) {
+      //   return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
+      // }
+      // return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
+      // TODO: Cambiar por el mensaje de bienvenida
+      return flowDynamic("Hola bienvenido soy un chatbot tu asistente de pedidos!", { delay: Constants.delayMessage });
     }
   )
   .addAnswer(
@@ -48,28 +57,29 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
       return flowDynamic("Perfecto " + ctx.body, { delay: Constants.delayMessage });
     }
   )
-  .addAnswer(
-    i18n.t("register.register_email"),
-    { capture: true, delay: Constants.delayMessage },
-    async (ctx, { state, fallBack }) => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(ctx.body)) {
-        return fallBack(i18n.t("register.register_email_invalid"));
-      }
-      const exists = await patioServiceApi.verifyExistsEmail(ctx.body);
-      if (exists) {
-        return fallBack(i18n.t("register.register_email_exists"));
-      }
-      await state.update({ email: ctx.body });
-    }
-  )
+  // .addAnswer(
+  //   i18n.t("register.register_email"),
+  //   { capture: true, delay: Constants.delayMessage },
+  //   async (ctx, { state, fallBack }) => {
+  //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //     if (!emailRegex.test(ctx.body)) {
+  //       return fallBack(i18n.t("register.register_email_invalid"));
+  //     }
+  //     const exists = await patioServiceApi.verifyExistsEmail(ctx.body);
+  //     if (exists) {
+  //       return fallBack(i18n.t("register.register_email_exists"));
+  //     }
+  //     await state.update({ email: ctx.body });
+  //   }
+  // )
   .addAnswer(
     i18n.t("register.register_saving"),
     { delay: Constants.delayMessage, },
     async (ctx, { state, endFlow, gotoFlow }) => {
       const phone = ctx.from;
       const name = state.get("name");
-      const email = state.get("email");
+      // const email = state.get("email");
+      const email = phone + "@" + config.domain;
       const user = await patioServiceApi.createUser(phone, name, email);
       if (user) {
         await LocalStorage.saveUser(state, {
@@ -85,8 +95,9 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
           if (products) {
             return gotoFlow(finishOrderFlow);
           } else {
-            ctx.body = "Muestrame el menu";
-            return gotoFlow(orderFlow);
+            ctx.body = "Hola";
+            // return gotoFlow(orderFlow);
+            return endFlow(menuText);
           }
         }
       } else {
@@ -95,4 +106,4 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
     }
   );
 
-export { registerFlow, formRegisterFlow };
+export { formRegisterFlow };

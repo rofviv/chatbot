@@ -7,8 +7,9 @@ import { orderFlow } from "./order_flow";
 import { getStatusOrderFlow } from "./order_status_flow";
 import { cancelOrderFlow } from "./order_cancel_flow";
 import { addressFlow } from "./address_flow";
-import { registerFlow } from "./register_flow";
+// import { registerFlow } from "./register_flow";
 import LocalStorage from "~/services/local_storage";
+import { formRegisterFlow } from "./register_flow";
 const promptIntentionDetection = path.join(
   process.cwd(),
   "assets/prompts",
@@ -24,12 +25,13 @@ export const intentionFlow = createFlowRouting
   .setKeyword(EVENTS.ACTION)
   .setIntentions({
     intentions: [
-      "GREETING",
+      // "GREETING",
       "CREATE_ORDER",
       "MENU",
       "STATUS_ORDER",
       "CANCEL_ORDER",
-      "END_FLOW",
+      "QUESTION_LOCATION",
+      // "END_FLOW",
       "NO_DETECTED",
     ],
     description: promptDetected,
@@ -52,21 +54,21 @@ export const intentionFlow = createFlowRouting
             if (intention === "CREATE_ORDER" || ctx.body == "1") {
               const currentUser = await LocalStorage.getUser(state);
               if (!currentUser) {
-                const registerPosponed = await LocalStorage.getRegisterPosponed(state);
-                if (!registerPosponed) {
-                  return gotoFlow(registerFlow);
-                } else {
-                  const address = await LocalStorage.getAddressCurrent(state);
-                  if (address) {
-                    ctx.body = "Muestrame el menu";
-                    return gotoFlow(orderFlow);
-                  } else {
-                    await state.update({
-                      onlyAddress: true,
-                    });
-                    return gotoFlow(addressFlow);
-                  }
-                }
+                // const registerPosponed = await LocalStorage.getRegisterPosponed(state);
+                // if (!registerPosponed) {
+                  return gotoFlow(formRegisterFlow);
+                // } else {
+                //   const address = await LocalStorage.getAddressCurrent(state);
+                //   if (address) {
+                //     ctx.body = "Muestrame el menu";
+                //     return gotoFlow(orderFlow);
+                //   } else {
+                //     await state.update({
+                //       onlyAddress: true,
+                //     });
+                //     return gotoFlow(addressFlow);
+                //   }
+                // }
               } else {
                 if (
                   currentUser &&
@@ -111,13 +113,17 @@ export const intentionFlow = createFlowRouting
               return gotoFlow(cancelOrderFlow);
             }
 
-            if (intention === "GREETING") {
-              return endFlow(menuText);
+            if (intention === "QUESTION_LOCATION") {
+              return endFlow("La ubicación es necesaria para verificar si hay cobertura en tu zona y para calcular el costo de envío, es necesario que nos compartas tu ubicación");
             }
 
-            if (intention === "END_FLOW") {
-              return endFlow(menuText);
-            }
+            // if (intention === "GREETING") {
+            //   return endFlow(menuText);
+            // }
+
+            // if (intention === "END_FLOW") {
+            //   return endFlow(menuText);
+            // }
 
             return endFlow(menuText);
           } catch (error) {

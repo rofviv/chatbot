@@ -19,11 +19,11 @@ export default {
         register_posponed: "Muy bien, te registraremos despues",
         register_fallback: "Por favor, responde con Si o No",
         register_accept: "Perfecto, voy a proceder a hacerte algunas preguntas",
-        register_name: "Primero, cual es tu nombre?",
+        register_name: "Podrías decirme cuál es tu nombre por favor?",
         register_email: "Ahora, cual es tu email?",
         register_email_invalid: "El email no es valido, por favor intenta de nuevo",
         register_email_exists: "El email ya está registrado, por favor intenta con otro",
-        register_saving: "Guardando datos, por favor espere..."
+        register_saving: "Espera un momento por favor..."
     },
     address: {
         address_first: "Necesitamos conocer tu ubicación",

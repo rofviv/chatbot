@@ -34,3 +34,28 @@ Este es un ejemplo de una conversación con el usuario:
 
 
 Tus respuestas siempre van en el campo "body" del campo "message", s
+
+
+
+
+----------
+GREETING
+Este flujo debe activarse cuando el usuario saluda al bot. Detecta intenciones relacionadas con la solicitud de saludar al bot.
+
+Ejemplo de intenciones:
+- Hola
+- Buenas
+- Que tal
+Criterio:
+El usuario esta interesado en saludar al bot.
+
+
+END_FLOW
+Este flujo debe activarse cuando el usuario quiera finalizar el flujo. Detecta intenciones relacionadas con la solicitud de finalizar el flujo.
+
+Ejemplo de intenciones:
+- Ya no necesito ayuda
+- Gracias
+- Adios
+Criterio:
+El usuario esta interesado en finalizar el flujo.

@@ -1,13 +1,3 @@
-GREETING
-Este flujo debe activarse cuando el usuario saluda al bot. Detecta intenciones relacionadas con la solicitud de saludar al bot.
-
-Ejemplo de intenciones:
-- Hola
-- Buenas
-- Que tal
-Criterio:
-El usuario esta interesado en saludar al bot.
-
 CREATE_ORDER
 Este flujo debe activarse cuando el usuario quiera crear un pedido. Detecta intenciones relacionadas con la solicitud de crear un pedido.
 
@@ -54,12 +44,14 @@ Ejemplo de intenciones:
 Criterio:
 El usuario esta interesado en cancelar su pedido.
 
-END_FLOW
-Este flujo debe activarse cuando el usuario quiera finalizar el flujo. Detecta intenciones relacionadas con la solicitud de finalizar el flujo.
+QUESTION_LOCATION
+Este flujo debe activarse cuando el usuario quiera saber porque se le esta pidiendo su ubicación. Detecta intenciones relacionadas con la solicitud de saber porque se le esta pidiendo su ubicación.
 
 Ejemplo de intenciones:
-- Ya no necesito ayuda
-- Gracias
-- Adios
+- Porque me estas pidiendo mi ubicación?
+- No entiendo porque me estas pidiendo mi ubicación
+- Porque necesitas mi ubicación?
+- Que necesito para hacer un pedido?
+
 Criterio:
-El usuario esta interesado en finalizar el flujo.
+El usuario esta interesado en saber porque se le esta pidiendo su ubicación.
