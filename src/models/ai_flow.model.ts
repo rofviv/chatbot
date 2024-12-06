@@ -15,6 +15,7 @@ export type AIResponse = {
   view_menu: boolean;
   is_finish: boolean;
   view_delivery_cost: boolean;
+  cancel_order: boolean;
 };
 
 // {

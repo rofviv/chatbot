@@ -10,16 +10,15 @@ import { addressFlow } from "./address_flow";
 // import { registerFlow } from "./register_flow";
 import LocalStorage from "~/services/local_storage";
 import { formRegisterFlow } from "./register_flow";
+import { optionsFlow } from "./options_flow";
 const promptIntentionDetection = path.join(
   process.cwd(),
   "assets/prompts",
   "promt_intention_detection.txt"
 );
 
-const menuPath = path.join(process.cwd(), "assets/messages", "menu.txt");
-
 const promptDetected = fs.readFileSync(promptIntentionDetection, "utf8");
-const menuText = fs.readFileSync(menuPath, "utf8");
+
 
 export const intentionFlow = createFlowRouting
   .setKeyword(EVENTS.ACTION)
@@ -125,7 +124,7 @@ export const intentionFlow = createFlowRouting
             //   return endFlow(menuText);
             // }
 
-            return endFlow(menuText);
+            return gotoFlow(optionsFlow);
           } catch (error) {
             console.error("Error in intentionFlow:", error);
           }

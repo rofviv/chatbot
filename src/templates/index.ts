@@ -11,6 +11,7 @@ import { merchantFlow } from "./merchant_flow";
 import { addressFlow, confirmAddressFlow, currentAddressFlow, newAddressFlow, newAddressRegisterFlow } from "./address_flow";
 import { empanadaFlow } from "./empanada_flow";
 import { finishOrderFlow } from "./finish_order_flow";
+import { optionsFlow } from "./options_flow";
 
 
 export default createFlow([
@@ -31,4 +32,5 @@ export default createFlow([
   newAddressRegisterFlow,
   confirmAddressFlow,
   finishOrderFlow,
+  optionsFlow,
 ]);

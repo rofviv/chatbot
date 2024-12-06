@@ -5,15 +5,9 @@ import { i18n } from "~/translations";
 import { addressFlow } from "./address_flow";
 import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
-import { orderFlow } from "./order_flow";
 import { finishOrderFlow } from "./finish_order_flow";
 import { config } from "~/config";
-
-import path from "path";
-import fs from "fs";
-
-const menuPath = path.join(process.cwd(), "assets/messages", "menu.txt");
-const menuText = fs.readFileSync(menuPath, "utf8");
+import { optionsFlow } from "./options_flow";
 
 // const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
 //   i18n.t("register.register_welcome"),
@@ -97,7 +91,7 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
           } else {
             ctx.body = "Hola";
             // return gotoFlow(orderFlow);
-            return endFlow(menuText);
+            return gotoFlow(optionsFlow);
           }
         }
       } else {

@@ -12,6 +12,7 @@ import LocalStorage from "~/services/local_storage";
 import ProductUtils from "~/utils/parse_products";
 import Utils from "~/utils/utils";
 import { AIResponse, AIResponseFinish } from "~/models/ai_flow.model";
+import { optionsFlow } from "./options_flow";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -59,14 +60,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         ...(state.get("messages") || []),
         { role: "user", content: ctx.body },
       ];
-      if (
-        ctx.body.toLowerCase() === i18n.t("hello").toLowerCase() ||
-        ctx.body.toLowerCase() === i18n.t("menu").toLowerCase() ||
-        ctx.body.toLowerCase() === "salir"
-      ) {
-        LocalStorage.clearOrderCurrent(state);
-        return gotoFlow(intentionFlow);
-      }
       const menuProducts = ProductUtils.productsParseText(
         JSON.parse(globalState.get("menuGlobal") as string)
       );
@@ -83,9 +76,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       }
       newPrompt += "\n" + promptFormat;
       const response = await AIService.chat(newPrompt, messages);
-      state.update({
-        messages: [...messages, { role: "assistant", content: response }],
-      });
       const responseParse = Utils.fixJSON(response) as AIResponse;
       console.log("response", responseParse);
       if (responseParse.view_delivery_cost) {
@@ -93,7 +83,10 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           return flowDynamic(
             `El costo de envío es de ${state.get("deliveryCost")} ${
               state.get("currency") || "BOB"
-            }`
+            }`,
+            {
+              delay: Constants.delayMessage,
+            }
           );
         }
         const res = await patioServiceApi.getQuote({
@@ -106,22 +99,39 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           vehicleTypeId: Constants.vehicleType_motorcycle,
           cityId: Constants.cityId_SC,
         });
-        return flowDynamic(
-          `El costo de envío es de ${res.baseCost} ${res.currency}`,
-          {
-            delay: 1000,
-          }
-        );
+        const msgDeliveryCost = `El costo de envío es de ${res.baseCost} ${res.currency}`;
+        state.update({
+          messages: [...messages, { role: "system", content: msgDeliveryCost }],
+        });
+        return flowDynamic(msgDeliveryCost, {
+          delay: Constants.delayMessage,
+        });
+      } else {
+        state.update({
+          messages: [...messages, { role: "assistant", content: response }],
+        });
+      }
+      if (responseParse.cancel_order) {
+        LocalStorage.clearOrderCurrent(state);
+        return endFlow("No hay problema, espero que vuelvas pronto");
+        // return gotoFlow(optionsFlow);
       }
       if (responseParse.view_menu) {
-        return flowDynamic([responseParse.message.body, categories]);
+        return flowDynamic([responseParse.message.body, categories], {
+          delay: Constants.delayMessage,
+        });
       }
       if (responseParse.is_finish) {
-        await flowDynamic("Realizando pedido... un momento por favor");
         messages = [...messages, { role: "system", content: promptFinish }];
         const responseFinish = await AIService.chat(newPrompt, messages);
         const responseParse = Utils.fixJSON(responseFinish) as AIResponseFinish;
         console.log("products", responseParse.products);
+        if (responseParse.products.length === 0) {
+          return endFlow("No hemos registrado ningun producto en tu pedido");
+        }
+        await flowDynamic("Realizando pedido... un momento por favor", {
+          delay: Constants.delayMessage,
+        });
         LocalStorage.clearOrderCurrent(state);
         state.update({
           messages: [],
@@ -139,7 +149,9 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           },
         ];
       }
-      return flowDynamic(sendMessage);
+      return flowDynamic(sendMessage, {
+        delay: Constants.delayMessage,
+      });
     } catch (error) {
       console.error("Error in faqFlow:", error);
       return endFlow("Por favor, intenta de nuevo");
