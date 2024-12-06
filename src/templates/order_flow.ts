@@ -37,7 +37,37 @@ const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
+    const onlyMenu = ctx.body.includes(":menu:");
+    if (onlyMenu) {
+      ctx.body = ctx.body.replace(":menu:", "");
+    }
     try {
+      const menuProducts = ProductUtils.productsParseText(
+        JSON.parse(globalState.get("menuGlobal") as string)
+      );
+      let newPrompt = prompt + "\nEl menu es: " + menuProducts;
+      // if (state.get("deliveryCost")) {
+      //   newPrompt +=
+      //     "\nEl costo de envío es de " +
+      //     state.get("deliveryCost") +
+      //     " " +
+      //     (state.get("currency") || "BOB");
+      // }
+      newPrompt += "\n" + promptFormat;
+      let messages = [
+        ...(state.get("messages") || []),
+        { role: "user", content: ctx.body },
+      ];
+      const response = await AIService.chat(newPrompt, messages);
+      const responseParse = Utils.fixJSON(response) as AIResponse;
+      console.log("response", responseParse);
+
+      if (onlyMenu) {
+        console.log("---------------------- VER SOLO MENU")
+        return flowDynamic(responseParse.message.body);
+      }
+      console.log("---------------------- PASO EL MENU")
+
       await LocalStorage.saveOrderCurrent(state, {
         id: 1,
         status: "pending",
@@ -56,28 +86,11 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
         merchants = await LocalStorage.getMerchantsNearByUser(state);
       }
-      let messages = [
-        ...(state.get("messages") || []),
-        { role: "user", content: ctx.body },
-      ];
-      const menuProducts = ProductUtils.productsParseText(
-        JSON.parse(globalState.get("menuGlobal") as string)
-      );
-      const categories = ProductUtils.parseCategories(
-        JSON.parse(globalState.get("menuGlobal") as string)
-      );
-      let newPrompt = prompt + "\nEl menu es: " + menuProducts;
-      if (state.get("deliveryCost")) {
-        newPrompt +=
-          "\nEl costo de envío es de " +
-          state.get("deliveryCost") +
-          " " +
-          (state.get("currency") || "BOB");
-      }
-      newPrompt += "\n" + promptFormat;
-      const response = await AIService.chat(newPrompt, messages);
-      const responseParse = Utils.fixJSON(response) as AIResponse;
-      console.log("response", responseParse);
+      
+      // const categories = ProductUtils.parseCategories(
+      //   JSON.parse(globalState.get("menuGlobal") as string)
+      // );
+      
       if (responseParse.view_delivery_cost) {
         if (state.get("deliveryCost")) {
           return flowDynamic(
@@ -116,11 +129,11 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         return endFlow("No hay problema, espero que vuelvas pronto");
         // return gotoFlow(optionsFlow);
       }
-      if (responseParse.view_menu) {
-        return flowDynamic([responseParse.message.body, categories], {
-          delay: Constants.delayMessage,
-        });
-      }
+      // if (responseParse.view_menu) {
+      //   return flowDynamic([responseParse.message.body, categories], {
+      //     delay: Constants.delayMessage,
+      //   });
+      // }
       if (responseParse.is_finish) {
         messages = [...messages, { role: "system", content: promptFinish }];
         const responseFinish = await AIService.chat(newPrompt, messages);

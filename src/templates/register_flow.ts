@@ -31,24 +31,24 @@ import { optionsFlow } from "./options_flow";
 // );
 
 const formRegisterFlow = addKeyword(EVENTS.ACTION)
-  // .addAnswer(i18n.t("register.register_accept"), { delay: Constants.delayMessage })
-  .addAction(
-    async (ctx, { state, flowDynamic }) => {
-      // const products = await state.get("products");
-      // if (products) {
-      //   return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
-      // }
-      // return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
-      // TODO: Cambiar por el mensaje de bienvenida
-      return flowDynamic("Hola bienvenido soy un chatbot tu asistente de pedidos!", { delay: Constants.delayMessage });
-    }
-  )
+  .addAnswer("Hola 👋 bienvenido! soy un bot 🤖 ingeligente que toma pedidos y gestiona la logistica 🛵", { delay: Constants.delayMessage })
+  // .addAction(
+  //   async (ctx, { state, flowDynamic }) => {
+  //     // const products = await state.get("products");
+  //     // if (products) {
+  //     //   return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
+  //     // }
+  //     // return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
+  //     // TODO: Cambiar por el mensaje de bienvenida
+  //     return flowDynamic("Hola bienvenido! soy un bot ingeligente que toma pedidos y gestiona la logistica", { delay: Constants.delayMessage });
+  //   }
+  // )
   .addAnswer(
     i18n.t("register.register_name"),
     { capture: true, delay: Constants.delayMessage },
     async (ctx, { state, flowDynamic }) => {
       await state.update({ name: ctx.body });
-      return flowDynamic("Perfecto " + ctx.body, { delay: Constants.delayMessage });
+      return flowDynamic("Perfecto " + ctx.body + "! 👍", { delay: Constants.delayMessage });
     }
   )
   // .addAnswer(
@@ -66,9 +66,9 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
   //     await state.update({ email: ctx.body });
   //   }
   // )
-  .addAnswer(
-    i18n.t("register.register_saving"),
-    { delay: Constants.delayMessage, },
+  .addAction(
+    // i18n.t("register.register_saving"),
+    // { delay: Constants.delayMessage, },
     async (ctx, { state, endFlow, gotoFlow }) => {
       const phone = ctx.from;
       const name = state.get("name");
@@ -81,19 +81,20 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
           lastOrder: undefined,
           lastDate: new Date(),
         });
-        const currentAddress = await LocalStorage.getAddressCurrent(state);
-        if (!currentAddress) {
-          return gotoFlow(addressFlow);
-        } else {
-          const products = await state.get("products");
-          if (products) {
-            return gotoFlow(finishOrderFlow);
-          } else {
-            ctx.body = "Hola";
-            // return gotoFlow(orderFlow);
-            return gotoFlow(optionsFlow);
-          }
-        }
+        return gotoFlow(optionsFlow);
+        // const currentAddress = await LocalStorage.getAddressCurrent(state);
+        // if (!currentAddress) {
+        //   return gotoFlow(addressFlow);
+        // } else {
+        //   const products = await state.get("products");
+        //   if (products) {
+        //     return gotoFlow(finishOrderFlow);
+        //   } else {
+        //     ctx.body = "Hola";
+        //     // return gotoFlow(orderFlow);
+        //     return gotoFlow(optionsFlow);
+        //   }
+        // }
       } else {
         return endFlow(i18n.t("register.error"));
       }

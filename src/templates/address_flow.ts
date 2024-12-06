@@ -36,7 +36,7 @@ export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
           });
           return gotoFlow(finishOrderFlow);
         }
-        ctx.body = "Muestrame el menu";
+        ctx.body = Constants.menuMessage;
         return gotoFlow(orderFlow);
       } else if (ctx.body.toLowerCase() === "no") {
         return gotoFlow(addressFlow);
@@ -60,13 +60,14 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
   { capture: true, delay: Constants.delayMessage },
   async (ctx, { state, flowDynamic, gotoFlow }) => {
     const currentUser = await LocalStorage.getUser(state);
+    const currentAddressLocation = await LocalStorage.getAddressCurrent(state);
     const currentAddress: AddressUserModel = {
       name: ctx.body,
       address: state.get("addressReferences"), // TODO: get address from coordinates
       references: state.get("addressReferences"),
-      latitude: state.get("coordinates").latitude,
-      longitude: state.get("coordinates").longitude,
-      coverageId: state.get("location").id,
+      latitude: currentAddressLocation.latitude,
+      longitude: currentAddressLocation.longitude,
+      coverageId: currentAddressLocation.coverageId,
       date: new Date(),
     };
     await LocalStorage.saveAddressCurrent(state, currentAddress);
@@ -88,7 +89,7 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
       }
     }
     await state.update({
-      coordinates: undefined,
+      // coordinates: undefined,
       newAddress: false,
       addressReferences: undefined,
     });
@@ -100,61 +101,63 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
       return gotoFlow(finishOrderFlow);
     }
     await flowDynamic("Gracias! Ahora puedes realizar tu pedido");
-    ctx.body = "Muestrame el menu";
+    ctx.body = Constants.menuMessage;
     return gotoFlow(orderFlow);
   }
 );
 
 export const addressFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
-    if (!state.get("coordinates")) {
-      await state.update({ newAddress: true });
-      const registerPosponed = await LocalStorage.getRegisterPosponed(state);
-      if (registerPosponed) {
-        await flowDynamic(i18n.t("address.address_first_posponed"), { delay: Constants.delayMessage });
-      } else {
-        await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
-      }
+    // if (!state.get("coordinates")) {
+      // await state.update({ newAddress: true });
+      // const registerPosponed = await LocalStorage.getRegisterPosponed(state);
+      // if (registerPosponed) {
+      //   await flowDynamic(i18n.t("address.address_first_posponed"), { delay: Constants.delayMessage });
+      // } else {
+      //   await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
+      // }
+      await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
       return endFlow(i18n.t("address.address_share"));
-    } else {
-      if (state.get("onlyAddress")) {
-        await LocalStorage.saveAddressCurrent(state, {
-          name: "Ultima ubicación",
-          address: "-",
-          references: "-",
-          latitude: state.get("coordinates").latitude,
-          longitude: state.get("coordinates").longitude,
-          coverageId: state.get("location").id,
-          date: new Date(),
-        });
-        state.update({
-          onlyAddress: undefined,
-          coordinates: undefined,
-          verifyAddress: true,
-        });
-        ctx.body = "Muestrame el menu";
-        return gotoFlow(orderFlow);
-      } else {
-        return gotoFlow(newAddressFlow);
-      }
-    }
+    // } else {
+    //   // if (state.get("onlyAddress")) {
+    //   await LocalStorage.saveAddressCurrent(state, {
+    //     name: "Ubicación actual",
+    //     address: "-",
+    //     references: "-",
+    //     latitude: state.get("coordinates").latitude,
+    //     longitude: state.get("coordinates").longitude,
+    //     coverageId: state.get("location").id,
+    //     date: new Date(),
+    //   });
+    //   state.update({
+    //     onlyAddress: undefined,
+    //     coordinates: undefined,
+    //     verifyAddress: true,
+    //   });
+    //   // TODO: MOSTRAR DIRECTAMENTE EL MENU DE CATEGORIAS
+    //   ctx.body = Constants.menuMessage;
+    //   return gotoFlow(orderFlow);
+    //   // } else {
+    //   //   return gotoFlow(newAddressFlow);
+    //   // }
+    // }
   }
 );
 
 export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, gotoFlow, endFlow, fallBack }) => {
     const currentUser = await LocalStorage.getUser(state);
-    await flowDynamic(
-      "Tienes " +
-        currentUser.data.addresses.length +
-        " direcciones registradas, cual deseas utilizar?\n" +
-        currentUser.data.addresses
-          .map(
-            (address: any, index: number) =>
-              `${index + 1}. ${address.address} - ${address.name}`
-          )
-          .join("\n") + "\n0. Crear una nueva direccion"
-    );
+    const optionAddress = currentUser.data.addresses
+    .map(
+      (address: any, index: number) =>
+        `${index + 1}. ${address.address} - ${address.name}`
+    )
+    .join("\n") + "\n0. Crear una nueva direccion";
+    let msgAddress = "Tienes " + currentUser.data.addresses.length + " direcciones registradas, cual deseas utilizar?";
+    if (currentUser.data.addresses.length == 1) {
+      msgAddress = "Tienes 1 direccion registrada, deseas usarla? marca la opcion 1 o crea una nueva";
+    }
+    await flowDynamic(msgAddress + "\n" + optionAddress);
   }
 ).addAction(
   { capture: true, delay: Constants.delayMessage },
@@ -176,7 +179,7 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
             return gotoFlow(finishOrderFlow);
           }
           await flowDynamic(`Muy bien, utilizaremos ${address.name}, ya puedes realizar tu pedido`, { delay: Constants.delayMessage });
-          ctx.body = "Muestrame el menu";
+          ctx.body = Constants.menuMessage;
           return gotoFlow(orderFlow);
         } else {
           return fallBack("Numero de direccion no encontrado");

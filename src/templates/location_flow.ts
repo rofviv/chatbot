@@ -21,21 +21,44 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
           globalState
         );
         if (merchantsGlobal.length > 0) {
+          await flowDynamic("Excelente, tenemos cobertura en tu zona", {
+             delay: Constants.delayMessage,
+           });
           const merchantsNear = await MerchantUtils.merchantNear(
             merchantsGlobal,
             latitude,
             longitude
           );
-          await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-          if (state.get("newAddress")) {
-            state.update({ coordinates: { latitude, longitude } });
-            return gotoFlow(addressFlow);
-          }
-          await flowDynamic(i18n.t("location.location_coverage"), {
-            delay: Constants.delayMessage,
+          if (merchantsNear.length > 0) { 
+            
+            await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+            await LocalStorage.saveAddressCurrent(state, {
+              name: "Ubicación actual",
+            address: "-",
+            references: "-",
+            latitude: latitude,
+            longitude: longitude,
+            coverageId: coverage.id,
+            date: new Date(),
           });
-          ctx.body = "Muestrame el menu";
+          state.update({
+            verifyAddress: true,
+          });
+          // TODO: ARREGLAR QUE CUANDO REGISTRE LA UBICACION AL FINALIZAR EL PEDIDO, NO SE VAYA A LA PAGINA DE INICIO
+          ctx.body = Constants.menuMessage;
           return gotoFlow(orderFlow);
+          // if (state.get("newAddress")) {
+          //   state.update({ coordinates: { latitude, longitude } });
+          //   return gotoFlow(addressFlow);
+          // }
+          // await flowDynamic(i18n.t("location.location_coverage"), {
+          //   delay: Constants.delayMessage,
+          // });
+          // ctx.body = Constants.menuMessage;
+          // return gotoFlow(orderFlow);
+          } else {
+            return endFlow(i18n.t("location.location_no_merchants"));
+          }
         } else {
           return endFlow(i18n.t("location.location_no_merchants"));
         }

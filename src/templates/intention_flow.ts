@@ -11,6 +11,7 @@ import { addressFlow } from "./address_flow";
 import LocalStorage from "~/services/local_storage";
 import { formRegisterFlow } from "./register_flow";
 import { optionsFlow } from "./options_flow";
+import Constants from "~/utils/constants";
 const promptIntentionDetection = path.join(
   process.cwd(),
   "assets/prompts",
@@ -52,56 +53,67 @@ export const intentionFlow = createFlowRouting
 
             if (intention === "CREATE_ORDER" || ctx.body == "1") {
               const currentUser = await LocalStorage.getUser(state);
-              if (!currentUser) {
-                // const registerPosponed = await LocalStorage.getRegisterPosponed(state);
-                // if (!registerPosponed) {
-                  return gotoFlow(formRegisterFlow);
-                // } else {
-                //   const address = await LocalStorage.getAddressCurrent(state);
-                //   if (address) {
-                //     ctx.body = "Muestrame el menu";
-                //     return gotoFlow(orderFlow);
-                //   } else {
-                //     await state.update({
-                //       onlyAddress: true,
-                //     });
-                //     return gotoFlow(addressFlow);
-                //   }
-                // }
-              } else {
+              // if (!currentUser) {
+              //   // const registerPosponed = await LocalStorage.getRegisterPosponed(state);
+              //   // if (!registerPosponed) {
+              //     return gotoFlow(formRegisterFlow);
+              //   // } else {
+              //   //   const address = await LocalStorage.getAddressCurrent(state);
+              //   //   if (address) {
+              //   //     ctx.body = "Muestrame el menu";
+              //   //     return gotoFlow(orderFlow);
+              //   //   } else {
+              //   //     await state.update({
+              //   //       onlyAddress: true,
+              //   //     });
+              //   //     return gotoFlow(addressFlow);
+              //   //   }
+              //   // }
+              // } else {
+                await state.update({
+                  verifyAddress: true,
+                });
+                const currentAddress = await LocalStorage.getAddressCurrent(state);
+                if (currentAddress) {
+                  return gotoFlow(orderFlow);
+                }
                 if (
                   currentUser &&
                   currentUser.data.addresses &&
                   currentUser.data.addresses.length > 0
                 ) {
-                  const currentAddress = await LocalStorage.getAddressCurrent(state);
-                  if (!currentAddress) {
-                    await LocalStorage.saveAddressCurrent(
-                      state,
-                      currentUser.data.addresses[0],
-                    );
-                  }
-                  await state.update({
-                    verifyAddress: true,
-                  });
+                  await LocalStorage.saveAddressCurrent(
+                    state,
+                    currentUser.data.addresses[0],
+                  );
+                  // await state.update({
+                  //   verifyAddress: true,
+                  // });
                   return gotoFlow(orderFlow);
-                } else {
+                } else {                   
                   return gotoFlow(addressFlow);
                 }
-              }
             }
 
             if (intention === "MENU" || ctx.body == "2") {
-              ctx.body = "Muestrame el menu";
-              const userAddress = await LocalStorage.getAddressCurrent(state);
-              if (userAddress) {
-                return gotoFlow(orderFlow);
+              let newBody = ":menu:";
+              if (ctx.body == "2") {
+                newBody += Constants.menuMessage;
               } else {
-                await state.update({
-                  onlyAddress: true,
-                });
-                return gotoFlow(addressFlow);
+                newBody += ctx.body;
               }
+              ctx.body = newBody;
+              return gotoFlow(orderFlow);
+              // ctx.body = "Muestrame el menu";
+              // const userAddress = await LocalStorage.getAddressCurrent(state);
+              // if (userAddress) {
+              //   return gotoFlow(orderFlow);
+              // } else {
+              //   await state.update({
+              //     onlyAddress: true,
+              //   });
+              //   return gotoFlow(addressFlow);
+              // }
             }
 
             if (intention === "STATUS_ORDER" || ctx.body == "3") {

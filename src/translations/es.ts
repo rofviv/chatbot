@@ -26,9 +26,9 @@ export default {
         register_saving: "Espera un momento por favor..."
     },
     address: {
-        address_first: "Necesitamos conocer tu ubicación",
+        address_first: "Antes de continuar con tu pedido, necesitamos conocer tu ubicación. Esto es necesario para calcular el costo de envío y para verificar si hay cobertura en tu zona",
         address_first_posponed: "Muy bien, pero lo que no podemos evitar es que necesitamos conocer tu ubicación",
-        address_share: "Por favor, envia tu ubicación GPS (ubicación normal no en tiempo real)",
+        address_share: "Por favor, comparte tu ubicación GPS (ubicación normal no en tiempo real)",
         address_fallback: "Por favor, responde con Si o No"
     },
     location: {
