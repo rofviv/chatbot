@@ -2,8 +2,6 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import AIService from "../services/ai_service";
 import path from "path";
 import fs from "fs";
-import { intentionFlow } from "./intention_flow";
-import { i18n } from "~/translations";
 import patioServiceApi from "~/services/patio_service_api";
 import Constants from "~/utils/constants";
 import MerchantUtils from "~/utils/merchant_near";
@@ -12,7 +10,6 @@ import LocalStorage from "~/services/local_storage";
 import ProductUtils from "~/utils/parse_products";
 import Utils from "~/utils/utils";
 import { AIResponse, AIResponseFinish } from "~/models/ai_flow.model";
-import { optionsFlow } from "./options_flow";
 
 const pathPrompt = path.join(
   process.cwd(),
@@ -35,6 +32,13 @@ const pathPromptFinish = path.join(
 );
 const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 
+const pathPromptMenu = path.join(
+  process.cwd(),
+  "assets/prompts",
+  "prompt_ai_menu.txt"
+);
+const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
+
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
     const onlyMenu = ctx.body.includes(":menu:");
@@ -45,15 +49,10 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       const menuProducts = ProductUtils.productsParseText(
         JSON.parse(globalState.get("menuGlobal") as string)
       );
-      let newPrompt = prompt + "\nEl menu es: " + menuProducts;
-      // if (state.get("deliveryCost")) {
-      //   newPrompt +=
-      //     "\nEl costo de envío es de " +
-      //     state.get("deliveryCost") +
-      //     " " +
-      //     (state.get("currency") || "BOB");
-      // }
-      newPrompt += "\n" + promptFormat;
+      let newPrompt = prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
+      if (onlyMenu) {
+        newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
+      }
       let messages = [
         ...(state.get("messages") || []),
         { role: "user", content: ctx.body },
@@ -63,10 +62,8 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       console.log("response", responseParse);
 
       if (onlyMenu) {
-        console.log("---------------------- VER SOLO MENU")
         return flowDynamic(responseParse.message.body);
       }
-      console.log("---------------------- PASO EL MENU")
 
       await LocalStorage.saveOrderCurrent(state, {
         id: 1,
@@ -91,17 +88,9 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       //   JSON.parse(globalState.get("menuGlobal") as string)
       // );
       
-      if (responseParse.view_delivery_cost) {
-        if (state.get("deliveryCost")) {
-          return flowDynamic(
-            `El costo de envío es de ${state.get("deliveryCost")} ${
-              state.get("currency") || "BOB"
-            }`,
-            {
-              delay: Constants.delayMessage,
-            }
-          );
-        }
+      let deliveryCost = await state.get("deliveryCost") as number;
+      if (!deliveryCost) {
+        let currency = await state.get("currency") as string;
         const res = await patioServiceApi.getQuote({
           merchantId: merchants[0].id,
           fromLatitude: merchants[0].latitude,
@@ -112,18 +101,21 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           vehicleTypeId: Constants.vehicleType_motorcycle,
           cityId: Constants.cityId_SC,
         });
-        const msgDeliveryCost = `El costo de envío es de ${res.baseCost} ${res.currency}`;
+        deliveryCost = res.baseCost + res.extraCost;
+        currency = res.currency;
+        const msgDeliveryCost = `El servicio de envío es de ${deliveryCost} ${currency}, tarifa calculada desde la sucursal de ${merchants[0].name}. Actualmente no aceptamos pedidos para retiro en el local y solo aceptamos pedidos a domicilio. Tampoco podemos cambiar la sucursal, se calcula desde la sucursal mas cercana.`;
         state.update({
           messages: [...messages, { role: "system", content: msgDeliveryCost }],
         });
-        return flowDynamic(msgDeliveryCost, {
-          delay: Constants.delayMessage,
-        });
-      } else {
-        state.update({
-          messages: [...messages, { role: "assistant", content: response }],
-        });
-      }
+        // return flowDynamic(msgDeliveryCost, {
+        //   delay: Constants.delayMessage,
+        // });
+      } 
+      // else {
+      //   state.update({
+      //     messages: [...messages, { role: "assistant", content: response }],
+      //   });
+      // }
       if (responseParse.cancel_order) {
         LocalStorage.clearOrderCurrent(state);
         return endFlow("No hay problema, espero que vuelvas pronto");

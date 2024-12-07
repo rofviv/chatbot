@@ -1,7 +1,7 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
 import { i18n } from "~/translations";
-import { addressFlow } from "./address_flow";
+import { newAddressFlow } from "./address_flow";
 import { orderFlow } from "./order_flow";
 import MerchantUtils from "~/utils/merchant_near";
 import LocalStorage from "~/services/local_storage";
@@ -21,32 +21,37 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
           globalState
         );
         if (merchantsGlobal.length > 0) {
-          await flowDynamic("Excelente, tenemos cobertura en tu zona", {
-             delay: Constants.delayMessage,
-           });
           const merchantsNear = await MerchantUtils.merchantNear(
             merchantsGlobal,
             latitude,
             longitude
           );
-          if (merchantsNear.length > 0) { 
-            
+          if (merchantsNear.length > 0) {
+            await flowDynamic("Excelente, tenemos cobertura en tu zona", {
+              delay: Constants.delayMessage,
+            });
             await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
             await LocalStorage.saveAddressCurrent(state, {
               name: "Ubicación actual",
-            address: "-",
-            references: "-",
-            latitude: latitude,
-            longitude: longitude,
-            coverageId: coverage.id,
-            date: new Date(),
+              address: "-",
+              references: "-",
+              latitude: latitude,
+              longitude: longitude,
+              coverageId: coverage.id,
+              date: new Date(),
           });
           state.update({
             verifyAddress: true,
           });
           // TODO: ARREGLAR QUE CUANDO REGISTRE LA UBICACION AL FINALIZAR EL PEDIDO, NO SE VAYA A LA PAGINA DE INICIO
-          ctx.body = Constants.menuMessage;
-          return gotoFlow(orderFlow);
+          const newAddress = await state.get("newAddress");
+          if (!newAddress) {
+            const msgUser = await state.get("msgUser");
+            ctx.body = msgUser || Constants.menuMessage;
+            return gotoFlow(orderFlow);
+          } else {
+            return gotoFlow(newAddressFlow);
+          }
           // if (state.get("newAddress")) {
           //   state.update({ coordinates: { latitude, longitude } });
           //   return gotoFlow(addressFlow);

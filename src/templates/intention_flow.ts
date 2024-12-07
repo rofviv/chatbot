@@ -52,6 +52,15 @@ export const intentionFlow = createFlowRouting
             console.log("Intention detected: ", intention);
 
             if (intention === "CREATE_ORDER" || ctx.body == "1") {
+              if (ctx.body == "1") {
+                state.update({
+                  msgUser: "Quiero hacer un pedido",
+                });
+              } else {
+                state.update({
+                  msgUser: ctx.body,
+                });
+              }
               const currentUser = await LocalStorage.getUser(state);
               // if (!currentUser) {
               //   // const registerPosponed = await LocalStorage.getRegisterPosponed(state);

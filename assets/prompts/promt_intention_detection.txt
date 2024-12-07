@@ -16,10 +16,7 @@ Este flujo debe activarse cuando el usuario quiera ver el menu. Detecta intencio
 Ejemplo de intenciones:
 - Menu
 - Cual es el menu?
-- Quiero ver el menu
-- Quiero ver los productos
-- Quiero ver los productos disponibles
-- Cuales son las promociones
+- Ver el menu
 
 Criterio:
 El usuario esta interesado en ver el menu.

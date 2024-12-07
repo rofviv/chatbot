@@ -2,7 +2,7 @@ import { addKeyword, EVENTS } from "@builderbot/bot";
 import patioServiceApi from "~/services/patio_service_api";
 import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
-import { confirmAddressFlow, currentAddressFlow, newAddressFlow } from "./address_flow";
+import { currentAddressFlow, newAddressFlow } from "./address_flow";
 import { formRegisterFlow } from "./register_flow";
 
 export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
@@ -81,7 +81,6 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
         //   nit: "",
         //   businessName: "",
       });
-      console.log(res);
       // TODO: save order in local storage
       return endFlow(
 `

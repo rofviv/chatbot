@@ -8,43 +8,43 @@ import { finishOrderFlow } from "./finish_order_flow";
 import Constants from "~/utils/constants";
 import { AddressUserModel } from "~/models/user.model";
 
-export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
-  .addAnswer(
-    "Queremos confirmar tu dirección actual",
-    { delay: Constants.delayMessage },
-    async (ctx, { state, flowDynamic }) => {
-      const currentUser = await LocalStorage.getUser(state);
-      const address = currentUser.data.addresses[0];
-      await LocalStorage.saveAddressCurrent(state, address);
-      return flowDynamic([
-        `${address.name} - ${address.address}`,
-        "Quieres usar esta direccion? Si / No",
-      ]);
-    }
-  )
-  .addAction(
-    { capture: true, delay: Constants.delayMessage },
-    async (ctx, { state, gotoFlow, fallBack }) => {
-      if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
-        const currentUser = await LocalStorage.getUser(state);
-        const address = currentUser.data.addresses[0];
-        await LocalStorage.saveAddressCurrent(state, address);
-        const products = await state.get("products");
-        if (products) {
-          await state.update({
-            verifyAddress: undefined,
-          });
-          return gotoFlow(finishOrderFlow);
-        }
-        ctx.body = Constants.menuMessage;
-        return gotoFlow(orderFlow);
-      } else if (ctx.body.toLowerCase() === "no") {
-        return gotoFlow(addressFlow);
-      } else {
-        return fallBack("Por favor, responde con si o no");
-      }
-    }
-  );
+// export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
+//   .addAnswer(
+//     "Queremos confirmar tu dirección actual",
+//     { delay: Constants.delayMessage },
+//     async (ctx, { state, flowDynamic }) => {
+//       const currentUser = await LocalStorage.getUser(state);
+//       const address = currentUser.data.addresses[0];
+//       await LocalStorage.saveAddressCurrent(state, address);
+//       return flowDynamic([
+//         `${address.name} - ${address.address}`,
+//         "Quieres usar esta direccion? Si / No",
+//       ]);
+//     }
+//   )
+//   .addAction(
+//     { capture: true, delay: Constants.delayMessage },
+//     async (ctx, { state, gotoFlow, fallBack }) => {
+//       if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
+//         const currentUser = await LocalStorage.getUser(state);
+//         const address = currentUser.data.addresses[0];
+//         await LocalStorage.saveAddressCurrent(state, address);
+//         const products = await state.get("products");
+//         if (products) {
+//           await state.update({
+//             verifyAddress: undefined,
+//           });
+//           return gotoFlow(finishOrderFlow);
+//         }
+//         ctx.body = Constants.menuMessage;
+//         return gotoFlow(orderFlow);
+//       } else if (ctx.body.toLowerCase() === "no") {
+//         return gotoFlow(addressFlow);
+//       } else {
+//         return fallBack("Por favor, responde con si o no");
+//       }
+//     }
+//   );
 
 export const newAddressFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "¿Podrías pasarme tu dirección escrita para ubicarte fácilmente? ej: Calle dechia #282",
@@ -90,7 +90,7 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
     }
     await state.update({
       // coordinates: undefined,
-      newAddress: false,
+      newAddress: undefined,
       addressReferences: undefined,
     });
     const products = await state.get("products");
@@ -116,7 +116,10 @@ export const addressFlow = addKeyword(EVENTS.ACTION).addAction(
       // } else {
       //   await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
       // }
-      await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
+      const newAddress = await state.get("newAddress");
+      if (!newAddress) {
+        await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
+      }
       return endFlow(i18n.t("address.address_share"));
     // } else {
     //   // if (state.get("onlyAddress")) {
@@ -165,6 +168,9 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
     const currentUser = await LocalStorage.getUser(state);
     try {
       if (ctx.body == "0") {
+        await state.update({
+          newAddress: true,
+        });
         return gotoFlow(addressFlow);
       }
       if (!isNaN(parseInt(ctx.body))) {
