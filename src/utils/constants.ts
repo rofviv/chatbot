@@ -1,4 +1,5 @@
 export default class Constants {
+  // TODO: Cambiar por variables de entorno
   static merchantDefaultId = 31970;
   static clientMerchantId = 3536;
   static vehicleType_motorcycle = 2;
