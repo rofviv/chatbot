@@ -27,10 +27,11 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     }
 
     const phone = ctx.from;
-    console.log("Phone", phone);
     const currentOrder = await LocalStorage.getOrderCurrent(state);
-    console.log("currentOrder: ", currentOrder);
-    if (currentOrder && currentOrder.date && currentOrder.date.getTime() > new Date().getTime() - 3600000) {
+    const currentUser = await LocalStorage.getUser(state);
+    console.log("Phone", phone);
+    console.log("currentUser: ", currentUser?.data?.name || "No user");
+    if (currentUser && currentOrder && currentOrder.date && currentOrder.date.getTime() > new Date().getTime() - 3600000) {
       return gotoFlow(orderFlow);
     } else {
       await LocalStorage.clearOrderCurrent(state);
@@ -39,7 +40,6 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
         deliveryCost: undefined,
       });
     }
-    const currentUser = await LocalStorage.getUser(state);
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {

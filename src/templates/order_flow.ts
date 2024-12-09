@@ -49,7 +49,8 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       const menuProducts = ProductUtils.productsParseText(
         JSON.parse(globalState.get("menuGlobal") as string)
       );
-      let newPrompt = prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
+      let newPrompt =
+        prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
       if (onlyMenu) {
         newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
       }
@@ -58,6 +59,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         { role: "user", content: ctx.body },
       ];
       const response = await AIService.chat(newPrompt, messages);
+      messages = [...messages, { role: "assistant", content: response }];
       const responseParse = Utils.fixJSON(response) as AIResponse;
       console.log("response", responseParse);
 
@@ -83,14 +85,14 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
         merchants = await LocalStorage.getMerchantsNearByUser(state);
       }
-      
+
       // const categories = ProductUtils.parseCategories(
       //   JSON.parse(globalState.get("menuGlobal") as string)
       // );
-      
-      let deliveryCost = await state.get("deliveryCost") as number;
+
+      let deliveryCost = (await state.get("deliveryCost")) as number;
       if (!deliveryCost) {
-        let currency = await state.get("currency") as string;
+        let currency = (await state.get("currency")) as string;
         const res = await patioServiceApi.getQuote({
           merchantId: merchants[0].id,
           fromLatitude: merchants[0].latitude,
@@ -110,14 +112,13 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         // return flowDynamic(msgDeliveryCost, {
         //   delay: Constants.delayMessage,
         // });
-      } 
-      // else {
-      //   state.update({
-      //     messages: [...messages, { role: "assistant", content: response }],
-      //   });
-      // }
+      } else {
+        state.update({
+          messages: [...messages],
+        });
+      }
       if (responseParse.cancel_order) {
-        LocalStorage.clearOrderCurrent(state);
+        await LocalStorage.clearOrderCurrent(state);
         return endFlow("No hay problema, espero que vuelvas pronto");
         // return gotoFlow(optionsFlow);
       }
