@@ -41,123 +41,133 @@ const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
 
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
-    const onlyMenu = ctx.body.includes(":menu:");
-    if (onlyMenu) {
-      ctx.body = ctx.body.replace(":menu:", "");
-    }
+
+    state.update({ isProcessingAI: true });
+    
     try {
-      const menuProducts = ProductUtils.productsParseText(
-        JSON.parse(globalState.get("menuGlobal") as string)
-      );
-      let newPrompt =
-        prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
+      const onlyMenu = ctx.body.includes(":menu:");
       if (onlyMenu) {
-        newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
+        ctx.body = ctx.body.replace(":menu:", "");
       }
-      let messages = [
-        ...(state.get("messages") || []),
-        { role: "user", content: ctx.body },
-      ];
-      const response = await AIService.chat(newPrompt, messages);
-      messages = [...messages, { role: "assistant", content: response }];
-      const responseParse = Utils.fixJSON(response) as AIResponse;
-      console.log("response", responseParse);
-
-      if (onlyMenu) {
-        return flowDynamic(responseParse.message.body);
-      }
-
-      await LocalStorage.saveOrderCurrent(state, {
-        id: 1,
-        status: "pending",
-      });
-      let merchants = await LocalStorage.getMerchantsNearByUser(state);
-      const userAddress = await LocalStorage.getAddressCurrent(state);
-      if (!merchants) {
-        const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
-          globalState
+      try {
+        const menuProducts = ProductUtils.productsParseText(
+          JSON.parse(globalState.get("menuGlobal") as string)
         );
-        const merchantsNear = await MerchantUtils.merchantNear(
-          merchantsGlobal,
-          userAddress.latitude,
-          userAddress.longitude
-        );
-        await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-        merchants = await LocalStorage.getMerchantsNearByUser(state);
-      }
-
-      // const categories = ProductUtils.parseCategories(
-      //   JSON.parse(globalState.get("menuGlobal") as string)
-      // );
-
-      let deliveryCost = (await state.get("deliveryCost")) as number;
-      if (!deliveryCost) {
-        let currency = (await state.get("currency")) as string;
-        const res = await patioServiceApi.getQuote({
-          merchantId: merchants[0].id,
-          fromLatitude: merchants[0].latitude,
-          fromLongitude: merchants[0].longitude,
-          toLatitude: userAddress.latitude,
-          toLongitude: userAddress.longitude,
-          returnRoute: 0,
-          vehicleTypeId: Constants.vehicleType_motorcycle,
-          cityId: Constants.cityId_SC,
-        });
-        deliveryCost = res.baseCost + res.extraCost;
-        currency = res.currency;
-        const msgDeliveryCost = `El servicio de envío es de ${deliveryCost} ${currency}, tarifa calculada desde la sucursal de ${merchants[0].name}. Actualmente no aceptamos pedidos para retiro en el local y solo aceptamos pedidos a domicilio. Tampoco podemos cambiar la sucursal, se calcula desde la sucursal mas cercana.`;
-        state.update({
-          messages: [...messages, { role: "system", content: msgDeliveryCost }],
-        });
-        // return flowDynamic(msgDeliveryCost, {
-        //   delay: Constants.delayMessage,
-        // });
-      } else {
-        state.update({
-          messages: [...messages],
-        });
-      }
-      if (responseParse.cancel_order) {
-        await LocalStorage.clearOrderCurrent(state);
-        return endFlow("No hay problema, espero que vuelvas pronto");
-        // return gotoFlow(optionsFlow);
-      }
-      // if (responseParse.view_menu) {
-      //   return flowDynamic([responseParse.message.body, categories], {
-      //     delay: Constants.delayMessage,
-      //   });
-      // }
-      if (responseParse.is_finish) {
-        messages = [...messages, { role: "system", content: promptFinish }];
-        const responseFinish = await AIService.chat(newPrompt, messages);
-        const responseParse = Utils.fixJSON(responseFinish) as AIResponseFinish;
-        console.log("products", responseParse.products);
-        if (responseParse.products.length === 0) {
-          return endFlow("No hemos registrado ningun producto en tu pedido");
+        let newPrompt =
+          prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
+        if (onlyMenu) {
+          newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
         }
-        await flowDynamic("Realizando pedido... un momento por favor", {
+        let messages = [
+          ...(state.get("messages") || []),
+          { role: "user", content: ctx.body },
+        ];
+        const response = await AIService.chat(newPrompt, messages);
+        messages = [...messages, { role: "assistant", content: response }];
+        const responseParse = Utils.fixJSON(response) as AIResponse;
+        console.log("response", responseParse);
+
+        if (onlyMenu) {
+          return flowDynamic(responseParse.message.body);
+        }
+
+        await LocalStorage.saveOrderCurrent(state, {
+          id: 1,
+          status: "pending",
+        });
+        let merchants = await LocalStorage.getMerchantsNearByUser(state);
+        const userAddress = await LocalStorage.getAddressCurrent(state);
+        if (!merchants) {
+          const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
+            globalState
+          );
+          const merchantsNear = await MerchantUtils.merchantNear(
+            merchantsGlobal,
+            userAddress.latitude,
+            userAddress.longitude
+          );
+          await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+          merchants = await LocalStorage.getMerchantsNearByUser(state);
+        }
+
+        // const categories = ProductUtils.parseCategories(
+        //   JSON.parse(globalState.get("menuGlobal") as string)
+        // );
+
+        let deliveryCost = (await state.get("deliveryCost")) as number;
+        if (!deliveryCost) {
+          let currency = (await state.get("currency")) as string;
+          const res = await patioServiceApi.getQuote({
+            merchantId: merchants[0].id,
+            fromLatitude: merchants[0].latitude,
+            fromLongitude: merchants[0].longitude,
+            toLatitude: userAddress.latitude,
+            toLongitude: userAddress.longitude,
+            returnRoute: 0,
+            vehicleTypeId: Constants.vehicleType_motorcycle,
+            cityId: Constants.cityId_SC,
+          });
+          deliveryCost = res.baseCost + res.extraCost;
+          currency = res.currency;
+          const msgDeliveryCost = `El servicio de envío es de ${deliveryCost} ${currency}, tarifa calculada desde la sucursal de ${merchants[0].name}. Actualmente no aceptamos pedidos para retiro en el local y solo aceptamos pedidos a domicilio. Tampoco podemos cambiar la sucursal, se calcula desde la sucursal mas cercana.`;
+          state.update({
+            messages: [...messages, { role: "system", content: msgDeliveryCost }],
+          });
+          // return flowDynamic(msgDeliveryCost, {
+          //   delay: Constants.delayMessage,
+          // });
+        } else {
+          state.update({
+            messages: [...messages],
+          });
+        }
+        if (responseParse.cancel_order) {
+          await LocalStorage.clearOrderCurrent(state);
+          return endFlow("No hay problema, espero que vuelvas pronto");
+          // return gotoFlow(optionsFlow);
+        }
+        // if (responseParse.view_menu) {
+        //   return flowDynamic([responseParse.message.body, categories], {
+        //     delay: Constants.delayMessage,
+        //   });
+        // }
+        if (responseParse.is_finish) {
+          messages = [...messages, { role: "system", content: promptFinish }];
+          const responseFinish = await AIService.chat(newPrompt, messages);
+          const responseParse = Utils.fixJSON(responseFinish) as AIResponseFinish;
+          console.log("products", responseParse.products);
+          if (responseParse.products.length === 0) {
+            return endFlow("No hemos registrado ningun producto en tu pedido");
+          }
+          await flowDynamic("Realizando pedido... un momento por favor", {
+            delay: Constants.delayMessage,
+          });
+          LocalStorage.clearOrderCurrent(state);
+          state.update({
+            messages: [],
+            deliveryCost: undefined,
+            products: responseParse.products,
+          });
+          return gotoFlow(finishOrderFlow);
+        }
+        let sendMessage: any = responseParse.message.body;
+        if (responseParse.message.media && responseParse.message.media !== "") {
+          sendMessage = [
+            {
+              body: responseParse.message.body,
+              media: responseParse.message.media,
+            },
+          ];
+        }
+        return flowDynamic(sendMessage, {
           delay: Constants.delayMessage,
         });
-        LocalStorage.clearOrderCurrent(state);
-        state.update({
-          messages: [],
-          deliveryCost: undefined,
-          products: responseParse.products,
-        });
-        return gotoFlow(finishOrderFlow);
+      } catch (error) {
+        console.error("Error in faqFlow:", error);
+        return endFlow("Por favor, intenta de nuevo");
+      } finally {
+        state.update({ isProcessingAI: false });
       }
-      let sendMessage: any = responseParse.message.body;
-      if (responseParse.message.media && responseParse.message.media !== "") {
-        sendMessage = [
-          {
-            body: responseParse.message.body,
-            media: responseParse.message.media,
-          },
-        ];
-      }
-      return flowDynamic(sendMessage, {
-        delay: Constants.delayMessage,
-      });
     } catch (error) {
       console.error("Error in faqFlow:", error);
       return endFlow("Por favor, intenta de nuevo");

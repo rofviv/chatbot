@@ -12,16 +12,21 @@ i18n.setLanguage(config.defaultLanguage as Language);
 
 const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
   async (ctx, { state, globalState, flowDynamic, gotoFlow }) => {
+    const isProcessing = state.get("isProcessingAI");
+    if (isProcessing) {
+      return;
+    }
+    // TODO: Cambiar por local storage y obtener el menu de su merchant mas cercano
     const menuGlobal = await LocalStorage.getMenuGlobal(globalState);
     if (!menuGlobal) {
-      const menu = await patioServiceApi.getProducts(Constants.merchantDefaultId);
+      const menu = await patioServiceApi.getProducts(config.merchantDefaultId);
       console.log("menuGlobal: ", menu.length);
       LocalStorage.saveMenuGlobal(globalState, JSON.stringify(menu));
     }
 
     const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
     if (!merchantsGlobal) {
-      const merchants = await patioServiceApi.merchantsByClient(Constants.clientMerchantId);
+      const merchants = await patioServiceApi.merchantsByClient(config.clientMerchantId);
       console.log("merchantsGlobal: ", merchants.length);
       LocalStorage.saveMerchantsGlobal(globalState, merchants);
     }

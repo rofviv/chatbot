@@ -10,5 +10,7 @@ export const config = {
     patioServiceToken: process.env.PATIO_SERVICE_TOKEN ?? 'patio-service-token',
     // Translation
     defaultLanguage: process.env.DEFAULT_LANGUAGE ?? 'es',
-    domain: process.env.DOMAIN ?? 'chatbot.patiodelivery.com'
+    domain: process.env.DOMAIN ?? 'chatbot.patiodelivery.com',
+    clientMerchantId: (process.env.CLIENT_MERCHANT_ID ?? 123) as number,
+    merchantDefaultId: (process.env.MERCHANT_DEFAULT_ID ?? 123) as number
 }

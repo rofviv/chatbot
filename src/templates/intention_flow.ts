@@ -47,6 +47,9 @@ export const intentionFlow = createFlowRouting
     afterEnd(flow) {
       return flow.addAction(
         async (ctx, { state, endFlow, gotoFlow }) => {
+
+          state.update({ isProcessingAI: true });
+
           try {
             const intention = await state.get("intention");
             console.log("Intention detected: ", intention);
@@ -148,6 +151,8 @@ export const intentionFlow = createFlowRouting
             return gotoFlow(optionsFlow);
           } catch (error) {
             console.error("Error in intentionFlow:", error);
+          } finally {
+            state.update({ isProcessingAI: false });
           }
         }
       );
