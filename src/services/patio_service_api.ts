@@ -242,7 +242,7 @@ class PatioServiceApi {
     }
   }
 
-  async createOrder(dto: CreateOrderDto): Promise<OrderModel> {
+  async createOrder(dto: CreateOrderDto): Promise<OrderModel | string>  {
     try {
       const response = await axios.post(
         `${config.patioServiceUrl}/api/orders`,
@@ -253,9 +253,13 @@ class PatioServiceApi {
           },
         }
       );
-      return response.data.data;
+      if (response.status === 200) {
+        return response.data.data;
+      } else {
+        return (response as any).message as string;
+      }
     } catch (error) {
-      return null;
+      return error;
     }
   }
 }

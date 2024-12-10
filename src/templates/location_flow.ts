@@ -17,28 +17,32 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         await state.update({
           location: coverage,
         });
-        const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
-          globalState
+        // const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
+        //   globalState
+        // );
+        const merchantsNear = await MerchantUtils.orderMerchantByDistanceUser(
+          globalState,
+          state
         );
-        if (merchantsGlobal.length > 0) {
-          const merchantsNear = await MerchantUtils.merchantNear(
-            merchantsGlobal,
-            latitude,
-            longitude
-          );
-          if (merchantsNear.length > 0) {
-            await flowDynamic("Excelente, tenemos cobertura en tu zona", {
-              delay: Constants.delayMessage,
-            });
-            await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-            await LocalStorage.saveAddressCurrent(state, {
-              name: "Ubicación actual",
-              address: "-",
-              references: "-",
-              latitude: latitude,
-              longitude: longitude,
-              coverageId: coverage.id,
-              date: new Date(),
+        // if (merchantsGlobal.length > 0) {
+        //   const merchantsNear = await MerchantUtils.merchantNear(
+        //     merchantsGlobal,
+        //     latitude,
+        //     longitude
+        //   );
+        if (merchantsNear.length > 0) {
+          await flowDynamic("Excelente, tenemos cobertura en tu zona", {
+            delay: Constants.delayMessage,
+          });
+          await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+          await LocalStorage.saveAddressCurrent(state, {
+            name: "Ubicación actual",
+            address: "-",
+            references: "-",
+            latitude: latitude,
+            longitude: longitude,
+            coverageId: coverage.id,
+            date: new Date(),
           });
           state.update({
             verifyAddress: true,
@@ -61,9 +65,9 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
           // });
           // ctx.body = Constants.menuMessage;
           // return gotoFlow(orderFlow);
-          } else {
-            return endFlow(i18n.t("location.location_no_merchants"));
-          }
+          // } else {
+          //   return endFlow(i18n.t("location.location_no_merchants"));
+          // }
         } else {
           return endFlow(i18n.t("location.location_no_merchants"));
         }

@@ -41,9 +41,8 @@ const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
 
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
-
     state.update({ isProcessingAI: true });
-    
+
     try {
       const onlyMenu = ctx.body.includes(":menu:");
       if (onlyMenu) {
@@ -78,16 +77,20 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         let merchants = await LocalStorage.getMerchantsNearByUser(state);
         const userAddress = await LocalStorage.getAddressCurrent(state);
         if (!merchants) {
-          const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
-            globalState
+          merchants = await MerchantUtils.orderMerchantByDistanceUser(
+            globalState,
+            state
           );
-          const merchantsNear = await MerchantUtils.merchantNear(
-            merchantsGlobal,
-            userAddress.latitude,
-            userAddress.longitude
-          );
-          await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-          merchants = await LocalStorage.getMerchantsNearByUser(state);
+          // const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
+          //   globalState
+          // );
+          // const merchantsNear = await MerchantUtils.merchantNear(
+          //   merchantsGlobal,
+          //   userAddress.latitude,
+          //   userAddress.longitude
+          // );
+          // await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+          // merchants = await LocalStorage.getMerchantsNearByUser(state);
         }
 
         // const categories = ProductUtils.parseCategories(
@@ -111,7 +114,10 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           currency = res.currency;
           const msgDeliveryCost = `El servicio de envío es de ${deliveryCost} ${currency}, tarifa calculada desde la sucursal de ${merchants[0].name}. Actualmente no aceptamos pedidos para retiro en el local y solo aceptamos pedidos a domicilio. Tampoco podemos cambiar la sucursal, se calcula desde la sucursal mas cercana.`;
           state.update({
-            messages: [...messages, { role: "system", content: msgDeliveryCost }],
+            messages: [
+              ...messages,
+              { role: "system", content: msgDeliveryCost },
+            ],
           });
           // return flowDynamic(msgDeliveryCost, {
           //   delay: Constants.delayMessage,
@@ -134,7 +140,9 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         if (responseParse.is_finish) {
           messages = [...messages, { role: "system", content: promptFinish }];
           const responseFinish = await AIService.chat(newPrompt, messages);
-          const responseParse = Utils.fixJSON(responseFinish) as AIResponseFinish;
+          const responseParse = Utils.fixJSON(
+            responseFinish
+          ) as AIResponseFinish;
           console.log("products", responseParse.products);
           if (responseParse.products.length === 0) {
             return endFlow("No hemos registrado ningun producto en tu pedido");

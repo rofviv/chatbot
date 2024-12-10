@@ -82,14 +82,17 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
         //   businessName: "",
       });
       // TODO: save order in local storage
-      return endFlow(
-`
+      if (typeof res === "string") {
+        return endFlow(res);
+      }
+      
+      return endFlow(`
 ¡Tu pedido *#${res.id}* ha sido confirmado! 🚀 Estamos preparando todo para que llegue a ti lo antes posible.
 
 📍 Puedes rastrear tu pedido en tiempo real haciendo clic en el siguiente enlace:
 ${res.deliveryTrackingUrl}
-`
-      );
+`);
+
     } catch (error) {
       console.log(error);
       return endFlow("Error al realizar el pedido");

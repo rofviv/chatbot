@@ -7,6 +7,7 @@ import LocalStorage from "~/services/local_storage";
 import { finishOrderFlow } from "./finish_order_flow";
 import Constants from "~/utils/constants";
 import { AddressUserModel } from "~/models/user.model";
+import MerchantUtils from "~/utils/merchant_near";
 
 // export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
 //   .addAnswer(
@@ -164,7 +165,7 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
   }
 ).addAction(
   { capture: true, delay: Constants.delayMessage },
-  async (ctx, { state, gotoFlow, fallBack, flowDynamic }) => {
+  async (ctx, { state, gotoFlow, fallBack, flowDynamic, globalState }) => {
     const currentUser = await LocalStorage.getUser(state);
     try {
       if (ctx.body == "0") {
@@ -177,6 +178,7 @@ export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
         const address = currentUser.data.addresses[parseInt(ctx.body) - 1];
         if (address) {
           await LocalStorage.saveAddressCurrent(state, address);
+          await MerchantUtils.orderMerchantByDistanceUser(globalState, state);
           const products = await state.get("products");
           if (products) {
             await state.update({

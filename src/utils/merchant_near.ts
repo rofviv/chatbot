@@ -1,7 +1,28 @@
+import { BotStateGlobal, BotStateStandAlone } from "@builderbot/bot/dist/types";
 import { MerchantModel } from "~/models/merchant.model";
+import LocalStorage from "~/services/local_storage";
 
 export default class MerchantUtils {
-  static async merchantNear(
+  static async orderMerchantByDistanceUser(
+    globalState: BotStateGlobal,
+    state: BotStateStandAlone
+  ): Promise<MerchantModel[]> {
+    const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
+    const userAddress = await LocalStorage.getAddressCurrent(state);
+    if (merchantsGlobal.length > 0) {
+      const merchantsNear = await this.sortMerchants(
+        merchantsGlobal,
+        userAddress.latitude,
+        userAddress.longitude
+      );
+      await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
+      return merchantsNear;
+    }
+
+    return [];
+  }
+
+  static async sortMerchants(
     merchants: MerchantModel[],
     latitude: number,
     longitude: number
