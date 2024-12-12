@@ -21,7 +21,7 @@ function checkHealth() {
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $_ENV['PATIO_SERVICE_TOKEN']
+            'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAsInVzZXJuYW1lIjoibWF0dUBnbWFpbC5jb20iLCJpYXQiOjE3MjY3NTgzNDUsImV4cCI6MTc1ODI5NDM0NX0.t_6GAPUfdiK3HsAi6mV3RLZawT58xoo5zSdxMzX-2-Q',
         ]);
         
         $response = curl_exec($ch);
