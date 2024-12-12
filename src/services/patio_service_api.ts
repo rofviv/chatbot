@@ -14,6 +14,7 @@ import { CreateAddressDto } from "~/dtos/create_address.dto";
 import { QuoteDto } from "~/dtos/quote.dto";
 import { QuoteModel } from "~/models/quote.model";
 import { CreateOrderDto } from "~/dtos/create_order.dto";
+import { HealthCheckResponse } from "~/dtos/response_status";
 
 class PatioServiceApi {
   private token: string;
@@ -260,6 +261,28 @@ class PatioServiceApi {
       }
     } catch (error) {
       return error;
+    }
+  }
+
+  async healthCheck(): Promise<HealthCheckResponse> {
+    try {
+      const response = await axios.get(
+        `${config.patioServiceUrl}/api/payment`,
+        {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return {
+        status: response.status,
+        message: response.data.message,
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Error in health check",
+      };
     }
   }
 }
