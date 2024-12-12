@@ -11,7 +11,7 @@ function checkHealth() {
 
     // Si la primera URL falla, intentar la segunda
     if ($response === false || $httpCode !== 200) {
-        $ch = curl_init('https://www.patio-driver.patiodelivery2.com/api/notification/send/goup/whatsapp');
+        $ch = curl_init('https://www.patio-driver.patiodelivery2.com/api/notification/send/group/whatsapp');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
