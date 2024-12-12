@@ -20,7 +20,8 @@ function checkHealth() {
             "message" => "*ATENCION BOT DE KIKY SIN SERVICIO TOMAR ATENCION*"
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $_ENV['PATIO_SERVICE_TOKEN']
         ]);
         
         $response = curl_exec($ch);
