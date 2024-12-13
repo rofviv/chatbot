@@ -20,6 +20,15 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
         // const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
         //   globalState
         // );
+        await LocalStorage.saveAddressCurrent(state, {
+          name: "Ubicación actual",
+          address: "-",
+          references: "-",
+          latitude: latitude,
+          longitude: longitude,
+          coverageId: coverage.id,
+          date: new Date(),
+        });
         const merchantsNear = await MerchantUtils.orderMerchantByDistanceUser(
           globalState,
           state
@@ -35,15 +44,6 @@ export const locationFlow = addKeyword(EVENTS.LOCATION).addAction(
             delay: Constants.delayMessage,
           });
           await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-          await LocalStorage.saveAddressCurrent(state, {
-            name: "Ubicación actual",
-            address: "-",
-            references: "-",
-            latitude: latitude,
-            longitude: longitude,
-            coverageId: coverage.id,
-            date: new Date(),
-          });
           state.update({
             verifyAddress: true,
           });
