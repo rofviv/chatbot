@@ -19,12 +19,6 @@ export const finishOrderFlow = addKeyword(EVENTS.ACTION).addAction(
         currentUser.data.addresses.length > 0
       ) {
         return gotoFlow(currentAddressFlow);
-      // } else if (
-      //   currentUser &&
-      //   currentUser.data.addresses &&
-      //   currentUser.data.addresses.length == 1
-      // ) {
-      //   return gotoFlow(confirmAddressFlow);
       } else {
         return gotoFlow(newAddressFlow);
       }

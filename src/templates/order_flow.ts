@@ -32,31 +32,31 @@ const pathPromptFinish = path.join(
 );
 const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 
-const pathPromptMenu = path.join(
-  process.cwd(),
-  "assets/prompts",
-  "prompt_ai_menu.txt"
-);
-const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
+// const pathPromptMenu = path.join(
+//   process.cwd(),
+//   "assets/prompts",
+//   "prompt_ai_menu.txt"
+// );
+// const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
 
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
     state.update({ isProcessingAI: true });
 
     try {
-      const onlyMenu = ctx.body.includes(":menu:");
-      if (onlyMenu) {
-        ctx.body = ctx.body.replace(":menu:", "");
-      }
+      // const onlyMenu = ctx.body.includes(":menu:");
+      // if (onlyMenu) {
+      //   ctx.body = ctx.body.replace(":menu:", "");
+      // }
       try {
         const menuProducts = ProductUtils.productsParseText(
           JSON.parse(globalState.get("menuGlobal") as string)
         );
         let newPrompt =
           prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
-        if (onlyMenu) {
-          newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
-        }
+        // if (onlyMenu) {
+        //   newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
+        // }
         let messages = [
           ...(state.get("messages") || []),
           { role: "user", content: ctx.body },
@@ -66,9 +66,9 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         const responseParse = Utils.fixJSON(response) as AIResponse;
         console.log("response", responseParse);
 
-        if (onlyMenu) {
-          return flowDynamic(responseParse.message.body);
-        }
+        // if (onlyMenu) {
+        //   return flowDynamic(responseParse.message.body);
+        // }
 
         await LocalStorage.saveOrderCurrent(state, {
           id: 1,

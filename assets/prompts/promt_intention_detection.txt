@@ -1,25 +1,15 @@
 CREATE_ORDER
-Este flujo debe activarse cuando el usuario quiera crear un pedido. Detecta intenciones relacionadas con la solicitud de crear un pedido.
+Este flujo debe activarse cuando el usuario quiera crear un pedido o ver el menu. Detecta intenciones relacionadas con la solicitud de crear un pedido o ver el menu.
 
 Ejemplo de intenciones:
 - Quiero crear un pedido
 - Quiero hacer un pedido
 - Quiero ordenar
 - Quiero comprar
-
-Criterio:
-El usuario esta interesado en crear un pedido y proporcionar detalles del pedido.
-
-MENU
-Este flujo debe activarse cuando el usuario quiera ver el menu. Detecta intenciones relacionadas con la solicitud de ver el menu.
-
-Ejemplo de intenciones:
 - Menu
 - Cual es el menu?
 - Ver el menu
-
-Criterio:
-El usuario esta interesado en ver el menu.
+- Quiero ver el menu
 
 STATUS_ORDER
 Este flujo debe activarse cuando el usuario quiera consultar el estado de su pedido. Detecta intenciones relacionadas con la solicitud de consultar el estado de un pedido.

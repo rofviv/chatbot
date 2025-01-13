@@ -1,6 +1,4 @@
 import { addKeyword } from "@builderbot/bot";
-import patioServiceApi from "../services/patio_service_api";
-import Constants from "~/utils/constants";
 import { EVENTS } from "@builderbot/bot";
 import fs from "fs";
 import path from "path";

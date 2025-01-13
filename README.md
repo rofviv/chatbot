@@ -1,4 +1,9 @@
 ## Whatsapp Chatbot Baileys
+node: 20.11.0
+pnpm: 9.12.1
+
+#### comands:
+pnpm run dev
 
 #### New client
 - Edit .env file with your credentials DOMAIN

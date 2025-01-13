@@ -16,7 +16,6 @@ import { optionsFlow } from "./options_flow";
 
 export default createFlow([
   mainFlow,
-  // registerFlow,
   formRegisterFlow,
   orderFlow,
   getStatusOrderFlow,
@@ -30,7 +29,6 @@ export default createFlow([
   newAddressFlow,
   currentAddressFlow,
   newAddressRegisterFlow,
-  // confirmAddressFlow,
   finishOrderFlow,
   optionsFlow,
 ]);

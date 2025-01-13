@@ -2,47 +2,13 @@ import { EVENTS } from "@builderbot/bot";
 import { addKeyword } from "@builderbot/bot";
 import patioServiceApi from "../services/patio_service_api";
 import { i18n } from "~/translations";
-import { addressFlow } from "./address_flow";
 import LocalStorage from "~/services/local_storage";
 import Constants from "~/utils/constants";
-import { finishOrderFlow } from "./finish_order_flow";
 import { config } from "~/config";
 import { optionsFlow } from "./options_flow";
 
-// const registerFlow = addKeyword(EVENTS.ACTION).addAnswer(
-//   i18n.t("register.register_welcome"),
-//   {
-//     capture: true,
-//     delay: Constants.delayMessage,
-//   },
-//   async (ctx, { state, gotoFlow, fallBack }) => {
-//     if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
-//       return gotoFlow(formRegisterFlow);
-//     } else if (ctx.body.toLowerCase() === "no" || ctx.body.toLowerCase() === "no") {
-//       await state.update({ registerPosponed: true });
-//       await state.update({
-//         onlyAddress: true,
-//       });
-//       return gotoFlow(addressFlow);
-//     } else {
-//       return fallBack(i18n.t("register.register_fallback"));
-//     }
-//   }
-// );
-
 const formRegisterFlow = addKeyword(EVENTS.ACTION)
   .addAnswer("Hola 👋 bienvenido! soy un bot 🤖 ingeligente que toma pedidos y gestiona la logistica 🛵", { delay: Constants.delayMessage })
-  // .addAction(
-  //   async (ctx, { state, flowDynamic }) => {
-  //     // const products = await state.get("products");
-  //     // if (products) {
-  //     //   return flowDynamic("Antes de finalizar, tengo que registrarte", { delay: Constants.delayMessage });
-  //     // }
-  //     // return flowDynamic(i18n.t("register.register_accept"), { delay: Constants.delayMessage });
-  //     // TODO: Cambiar por el mensaje de bienvenida
-  //     return flowDynamic("Hola bienvenido! soy un bot ingeligente que toma pedidos y gestiona la logistica", { delay: Constants.delayMessage });
-  //   }
-  // )
   .addAnswer(
     i18n.t("register.register_name"),
     { capture: true, delay: Constants.delayMessage },
@@ -51,28 +17,10 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
       return flowDynamic("Perfecto " + ctx.body + "! 👍", { delay: Constants.delayMessage });
     }
   )
-  // .addAnswer(
-  //   i18n.t("register.register_email"),
-  //   { capture: true, delay: Constants.delayMessage },
-  //   async (ctx, { state, fallBack }) => {
-  //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //     if (!emailRegex.test(ctx.body)) {
-  //       return fallBack(i18n.t("register.register_email_invalid"));
-  //     }
-  //     const exists = await patioServiceApi.verifyExistsEmail(ctx.body);
-  //     if (exists) {
-  //       return fallBack(i18n.t("register.register_email_exists"));
-  //     }
-  //     await state.update({ email: ctx.body });
-  //   }
-  // )
   .addAction(
-    // i18n.t("register.register_saving"),
-    // { delay: Constants.delayMessage, },
     async (ctx, { state, endFlow, gotoFlow }) => {
       const phone = ctx.from;
       const name = state.get("name");
-      // const email = state.get("email");
       const email = phone + "@" + config.domain;
       const user = await patioServiceApi.createUser(phone, name, email);
       if (user) {
@@ -82,19 +30,6 @@ const formRegisterFlow = addKeyword(EVENTS.ACTION)
           lastDate: new Date(),
         });
         return gotoFlow(optionsFlow);
-        // const currentAddress = await LocalStorage.getAddressCurrent(state);
-        // if (!currentAddress) {
-        //   return gotoFlow(addressFlow);
-        // } else {
-        //   const products = await state.get("products");
-        //   if (products) {
-        //     return gotoFlow(finishOrderFlow);
-        //   } else {
-        //     ctx.body = "Hola";
-        //     // return gotoFlow(orderFlow);
-        //     return gotoFlow(optionsFlow);
-        //   }
-        // }
       } else {
         return endFlow(i18n.t("register.error"));
       }

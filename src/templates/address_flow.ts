@@ -1,6 +1,5 @@
 import { addKeyword, EVENTS } from "@builderbot/bot";
 import { i18n } from "~/translations";
-import { intentionFlow } from "./intention_flow";
 import patioServiceApi from "~/services/patio_service_api";
 import { orderFlow } from "./order_flow";
 import LocalStorage from "~/services/local_storage";
@@ -8,44 +7,6 @@ import { finishOrderFlow } from "./finish_order_flow";
 import Constants from "~/utils/constants";
 import { AddressUserModel } from "~/models/user.model";
 import MerchantUtils from "~/utils/merchant_near";
-
-// export const confirmAddressFlow = addKeyword(EVENTS.ACTION)
-//   .addAnswer(
-//     "Queremos confirmar tu dirección actual",
-//     { delay: Constants.delayMessage },
-//     async (ctx, { state, flowDynamic }) => {
-//       const currentUser = await LocalStorage.getUser(state);
-//       const address = currentUser.data.addresses[0];
-//       await LocalStorage.saveAddressCurrent(state, address);
-//       return flowDynamic([
-//         `${address.name} - ${address.address}`,
-//         "Quieres usar esta direccion? Si / No",
-//       ]);
-//     }
-//   )
-//   .addAction(
-//     { capture: true, delay: Constants.delayMessage },
-//     async (ctx, { state, gotoFlow, fallBack }) => {
-//       if (ctx.body.toLowerCase() === "si" || ctx.body.toLowerCase() === "yes") {
-//         const currentUser = await LocalStorage.getUser(state);
-//         const address = currentUser.data.addresses[0];
-//         await LocalStorage.saveAddressCurrent(state, address);
-//         const products = await state.get("products");
-//         if (products) {
-//           await state.update({
-//             verifyAddress: undefined,
-//           });
-//           return gotoFlow(finishOrderFlow);
-//         }
-//         ctx.body = Constants.menuMessage;
-//         return gotoFlow(orderFlow);
-//       } else if (ctx.body.toLowerCase() === "no") {
-//         return gotoFlow(addressFlow);
-//       } else {
-//         return fallBack("Por favor, responde con si o no");
-//       }
-//     }
-//   );
 
 export const newAddressFlow = addKeyword(EVENTS.ACTION).addAnswer(
   "¿Podrías pasarme tu dirección escrita para ubicarte fácilmente? ej: Calle dechia #282",
@@ -90,7 +51,6 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
       }
     }
     await state.update({
-      // coordinates: undefined,
       newAddress: undefined,
       addressReferences: undefined,
     });
@@ -108,48 +68,17 @@ export const newAddressRegisterFlow = addKeyword(EVENTS.ACTION).addAnswer(
 );
 
 export const addressFlow = addKeyword(EVENTS.ACTION).addAction(
-  async (ctx, { state, flowDynamic, gotoFlow, endFlow }) => {
-    // if (!state.get("coordinates")) {
-      // await state.update({ newAddress: true });
-      // const registerPosponed = await LocalStorage.getRegisterPosponed(state);
-      // if (registerPosponed) {
-      //   await flowDynamic(i18n.t("address.address_first_posponed"), { delay: Constants.delayMessage });
-      // } else {
-      //   await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
-      // }
+  async (ctx, { state, flowDynamic, endFlow }) => {
       const newAddress = await state.get("newAddress");
       if (!newAddress) {
         await flowDynamic(i18n.t("address.address_first"), { delay: Constants.delayMessage });
       }
       return endFlow(i18n.t("address.address_share"));
-    // } else {
-    //   // if (state.get("onlyAddress")) {
-    //   await LocalStorage.saveAddressCurrent(state, {
-    //     name: "Ubicación actual",
-    //     address: "-",
-    //     references: "-",
-    //     latitude: state.get("coordinates").latitude,
-    //     longitude: state.get("coordinates").longitude,
-    //     coverageId: state.get("location").id,
-    //     date: new Date(),
-    //   });
-    //   state.update({
-    //     onlyAddress: undefined,
-    //     coordinates: undefined,
-    //     verifyAddress: true,
-    //   });
-    //   // TODO: MOSTRAR DIRECTAMENTE EL MENU DE CATEGORIAS
-    //   ctx.body = Constants.menuMessage;
-    //   return gotoFlow(orderFlow);
-    //   // } else {
-    //   //   return gotoFlow(newAddressFlow);
-    //   // }
-    // }
   }
 );
 
 export const currentAddressFlow = addKeyword(EVENTS.ACTION).addAction(
-  async (ctx, { state, flowDynamic, gotoFlow, endFlow, fallBack }) => {
+  async (ctx, { state, flowDynamic }) => {
     const currentUser = await LocalStorage.getUser(state);
     const optionAddress = currentUser.data.addresses
     .map(

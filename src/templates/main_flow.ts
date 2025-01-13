@@ -5,7 +5,6 @@ import patioServiceApi from "../services/patio_service_api";
 import { orderFlow } from "./order_flow";
 import { config } from "~/config";
 import LocalStorage from "~/services/local_storage";
-import Constants from "~/utils/constants";
 import { formRegisterFlow } from "./register_flow";
 
 i18n.setLanguage(config.defaultLanguage as Language);
@@ -48,7 +47,6 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
     if (!currentUser) {
       const userInfo = await patioServiceApi.getUser(phone);
       if (!userInfo) {
-        // return gotoFlow(intentionFlow);
         return gotoFlow(formRegisterFlow);
       } else {
         await LocalStorage.saveUser(state, {
