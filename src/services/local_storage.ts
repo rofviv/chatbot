@@ -13,8 +13,8 @@ export default class LocalStorage {
     return state.get("user") as CurrentUserModel | undefined;
   }
 
-  static async getMenuGlobal(globalState: BotStateGlobal): Promise<string | undefined> {
-    return globalState.get("menuGlobal") as string | undefined;
+  static async getMenu(state: BotStateStandAlone): Promise<string | undefined> {
+    return state.get("menuGlobal") as string | undefined;
   }
 
   static async getMerchantsGlobal(globalState: BotStateGlobal): Promise<MerchantModel[] | []> {
@@ -25,8 +25,8 @@ export default class LocalStorage {
     await globalState.update({ merchantsGlobal: merchants });
   }
 
-  static async saveMenuGlobal(globalState: BotStateGlobal, menu: string): Promise<void> {
-    await globalState.update({ menuGlobal: menu });
+  static async saveMenu(state: BotStateStandAlone, menu: string): Promise<void> {
+    await state.update({ menuGlobal: menu });
   }
 
   static async getOrderCurrent(state: BotStateStandAlone): Promise<CurrentOrderModel | undefined> {

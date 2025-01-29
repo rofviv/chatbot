@@ -16,11 +16,11 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
       return;
     }
     // TODO: Cambiar por local storage y obtener el menu de su merchant mas cercano
-    const menuGlobal = await LocalStorage.getMenuGlobal(globalState);
+    const menuGlobal = await LocalStorage.getMenu(state);
     if (!menuGlobal) {
       const menu = await patioServiceApi.getProducts(config.merchantDefaultId);
-      console.log("menuGlobal: ", menu.length);
-      LocalStorage.saveMenuGlobal(globalState, JSON.stringify(menu));
+      console.log("menu: ", menu.length);
+      LocalStorage.saveMenu(state, JSON.stringify(menu));
     }
 
     const merchantsGlobal = await LocalStorage.getMerchantsGlobal(globalState);
@@ -66,6 +66,9 @@ const mainFlow = addKeyword(EVENTS.WELCOME).addAction(
         lastDate: new Date(),
       });
       if (diffTime > unDia) {
+        const menu = await patioServiceApi.getProducts(config.merchantDefaultId);
+        console.log("menu UPDATED: ", menu.length);
+        await LocalStorage.saveMenu(state, JSON.stringify(menu));
         await flowDynamic(
           `Hola! ${currentUser.data?.name}, gracias por volver a contactarnos`
         );
