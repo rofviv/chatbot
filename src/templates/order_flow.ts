@@ -49,8 +49,10 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
       //   ctx.body = ctx.body.replace(":menu:", "");
       // }
       try {
+        const menuGlobal = await LocalStorage.getMenu(state)
         const menuProducts = ProductUtils.productsParseText(
-          JSON.parse(globalState.get("menuGlobal") as string)
+          JSON.parse(menuGlobal as string)
+          // JSON.parse(globalState.get("menuGlobal") as string)
         );
         let newPrompt =
           prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
