@@ -9,7 +9,6 @@ import { locationFlow } from "./location_flow";
 import { voiceFlow } from "./voice_flow";
 import { merchantFlow } from "./merchant_flow";
 import { addressFlow, currentAddressFlow, newAddressFlow, newAddressRegisterFlow } from "./address_flow";
-import { empanadaFlow } from "./empanada_flow";
 import { finishOrderFlow } from "./finish_order_flow";
 import { optionsFlow } from "./options_flow";
 
@@ -25,7 +24,6 @@ export default createFlow([
   voiceFlow,
   merchantFlow,
   addressFlow,
-  empanadaFlow,
   newAddressFlow,
   currentAddressFlow,
   newAddressRegisterFlow,
