@@ -5,8 +5,8 @@ export type QuoteModel = {
   maxPickupDuration: number;
   distance: number;
   currency: string;
-  baseCost: number;
-  extraCost: number;
+  baseCost?: number;
+  extraCost?: number;
   currentDate: string;
   coverageId: number;
   estimatePickupTime: string;

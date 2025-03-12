@@ -99,7 +99,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         //   JSON.parse(globalState.get("menuGlobal") as string)
         // );
 
-        let deliveryCost = (await state.get("deliveryCost")) as number;
+        let deliveryCost = (await state.get("deliveryCost")) as number | undefined;
         if (!deliveryCost) {
           let currency = (await state.get("currency")) as string;
           const res = await patioServiceApi.getQuote({
@@ -112,7 +112,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
             vehicleTypeId: Constants.vehicleType_motorcycle,
             cityId: Constants.cityId_SC,
           });
-          deliveryCost = res.baseCost + res.extraCost;
+          deliveryCost = res.baseCost ?? 0 + res.extraCost ?? 0;
           currency = res.currency;
           const msgDeliveryCost = `El servicio de envío es de ${deliveryCost} ${currency}, tarifa calculada desde la sucursal de ${merchants[0].name}. Actualmente no aceptamos pedidos para retiro en el local y solo aceptamos pedidos a domicilio. Tampoco podemos cambiar la sucursal, se calcula desde la sucursal mas cercana.`;
           state.update({
