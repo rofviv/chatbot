@@ -14,7 +14,7 @@ import { config } from "~/config";
 const pathPrompt = path.join(
   process.cwd(),
   "assets/prompts",
-  config.providerAssetsName,
+  config.providerAssetsOrder,
   "prompt_ai_order.txt"
 );
 const prompt = fs.readFileSync(pathPrompt, "utf8");
@@ -97,7 +97,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
 
         if (responseParse.cancel_order) {
           await LocalStorage.clearOrderCurrent(state);
-          return endFlow("No hay problema, espero que vuelvas pronto");
+          return endFlow(responseParse.message.body || "No hay problema, espero que vuelvas pronto");
         }
 
         if (responseParse.is_finish) {
