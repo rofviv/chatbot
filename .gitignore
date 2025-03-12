@@ -1,8 +1,10 @@
 dist/*
 node_modules
+
+# Ignorar todos los archivos de ambiente
+.env
 .env.kiky
 .env.wooky
-.env
 
 *_sessions
 *tokens
