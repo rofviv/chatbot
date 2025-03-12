@@ -3,7 +3,6 @@ import { MemoryDB as Database } from "@builderbot/bot";
 import { config } from "./config";
 import { provider } from "./provider";
 import templates from "./templates";
-import patio_service_api from "./services/patio_service_api";
 import { HealthCheckResponse } from "./dtos/response_status";
 
 interface HealthStatus {

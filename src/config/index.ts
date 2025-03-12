@@ -1,4 +1,13 @@
 import "dotenv/config"
+import { config as dotenvConfig } from "dotenv"
+import path from "path"
+
+const envFile = process.env.ENV_FILE || ".env"
+const envPath = path.resolve(process.cwd(), `${envFile}`)
+
+dotenvConfig({ path: envPath })
+
+console.log(`- envPath: ${envPath}`)
 
 export const config = {
     port: process.env.PORT ?? 3008,
@@ -11,6 +20,7 @@ export const config = {
     // Translation
     defaultLanguage: process.env.DEFAULT_LANGUAGE ?? 'es',
     domain: process.env.DOMAIN ?? 'chatbot.patiodelivery.com',
-    clientMerchantId: (process.env.CLIENT_MERCHANT_ID ?? 123) as number,
-    merchantDefaultId: (process.env.MERCHANT_DEFAULT_ID ?? 123) as number
+    clientMerchantId: (process.env.CLIENT_MERCHANT_ID ?? 1) as number,
+    merchantDefaultId: (process.env.MERCHANT_DEFAULT_ID ?? 1) as number,
+    providerAssetsName: process.env.PROVIDER_ASSETS_NAME ?? 'default'
 }

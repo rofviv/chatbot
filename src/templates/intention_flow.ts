@@ -22,13 +22,10 @@ export const intentionFlow = createFlowRouting
   .setKeyword(EVENTS.ACTION)
   .setIntentions({
     intentions: [
-      // "GREETING",
       "CREATE_ORDER",
-      // "MENU",
       "STATUS_ORDER",
       "CANCEL_ORDER",
       "QUESTION_LOCATION",
-      // "END_FLOW",
       "NO_DETECTED",
     ],
     description: promptDetected,
@@ -92,17 +89,6 @@ export const intentionFlow = createFlowRouting
             }
           }
 
-          // if (intention === "MENU" || ctx.body == "2") {
-          //   let newBody = ":menu:";
-          //   if (ctx.body == "2") {
-          //     newBody += Constants.menuMessage;
-          //   } else {
-          //     newBody += ctx.body;
-          //   }
-          //   ctx.body = newBody;
-          //   return gotoFlow(orderFlow);
-          // }
-
           if (intention === "STATUS_ORDER" || ctx.body == "3") {
             return gotoFlow(getStatusOrderFlow);
           }
@@ -116,14 +102,6 @@ export const intentionFlow = createFlowRouting
               "La ubicación es necesaria para verificar si hay cobertura en tu zona y para calcular el costo de envío, es necesario que nos compartas tu ubicación"
             );
           }
-
-          // if (intention === "GREETING") {
-          //   return endFlow(menuText);
-          // }
-
-          // if (intention === "END_FLOW") {
-          //   return endFlow(menuText);
-          // }
 
           return gotoFlow(optionsFlow);
         } catch (error) {

@@ -10,10 +10,11 @@ import LocalStorage from "~/services/local_storage";
 import ProductUtils from "~/utils/parse_products";
 import Utils from "~/utils/utils";
 import { AIResponse, AIResponseFinish } from "~/models/ai_flow.model";
-
+import { config } from "~/config";
 const pathPrompt = path.join(
   process.cwd(),
   "assets/prompts",
+  config.providerAssetsName,
   "prompt_ai_order.txt"
 );
 const prompt = fs.readFileSync(pathPrompt, "utf8");
@@ -32,33 +33,18 @@ const pathPromptFinish = path.join(
 );
 const promptFinish = fs.readFileSync(pathPromptFinish, "utf8");
 
-// const pathPromptMenu = path.join(
-//   process.cwd(),
-//   "assets/prompts",
-//   "prompt_ai_menu.txt"
-// );
-// const promptMenu = fs.readFileSync(pathPromptMenu, "utf8");
-
 export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
   async (ctx, { state, flowDynamic, endFlow, gotoFlow, globalState }) => {
     state.update({ isProcessingAI: true });
 
     try {
-      // const onlyMenu = ctx.body.includes(":menu:");
-      // if (onlyMenu) {
-      //   ctx.body = ctx.body.replace(":menu:", "");
-      // }
       try {
         const menuGlobal = await LocalStorage.getMenu(state)
         const menuProducts = ProductUtils.productsParseText(
           JSON.parse(menuGlobal as string)
-          // JSON.parse(globalState.get("menuGlobal") as string)
         );
         let newPrompt =
           prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
-        // if (onlyMenu) {
-        //   newPrompt = promptMenu + "\nEl menu es: " + menuProducts;
-        // }
         let messages = [
           ...(state.get("messages") || []),
           { role: "user", content: ctx.body },
@@ -67,10 +53,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         messages = [...messages, { role: "assistant", content: response }];
         const responseParse = Utils.fixJSON(response) as AIResponse;
         console.log("response", responseParse);
-
-        // if (onlyMenu) {
-        //   return flowDynamic(responseParse.message.body);
-        // }
 
         await LocalStorage.saveOrderCurrent(state, {
           id: 1,
@@ -83,21 +65,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
             globalState,
             state
           );
-          // const merchantsGlobal = await LocalStorage.getMerchantsGlobal(
-          //   globalState
-          // );
-          // const merchantsNear = await MerchantUtils.merchantNear(
-          //   merchantsGlobal,
-          //   userAddress.latitude,
-          //   userAddress.longitude
-          // );
-          // await LocalStorage.saveMerchantsNearByUser(state, merchantsNear);
-          // merchants = await LocalStorage.getMerchantsNearByUser(state);
         }
-
-        // const categories = ProductUtils.parseCategories(
-        //   JSON.parse(globalState.get("menuGlobal") as string)
-        // );
 
         let deliveryCost = (await state.get("deliveryCost")) as number | undefined;
         if (!deliveryCost) {
@@ -121,24 +89,17 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
               { role: "system", content: msgDeliveryCost },
             ],
           });
-          // return flowDynamic(msgDeliveryCost, {
-          //   delay: Constants.delayMessage,
-          // });
         } else {
           state.update({
             messages: [...messages],
           });
         }
+
         if (responseParse.cancel_order) {
           await LocalStorage.clearOrderCurrent(state);
           return endFlow("No hay problema, espero que vuelvas pronto");
-          // return gotoFlow(optionsFlow);
         }
-        // if (responseParse.view_menu) {
-        //   return flowDynamic([responseParse.message.body, categories], {
-        //     delay: Constants.delayMessage,
-        //   });
-        // }
+
         if (responseParse.is_finish) {
           messages = [...messages, { role: "system", content: promptFinish }];
           const responseFinish = await AIService.chat(newPrompt, messages);
@@ -146,6 +107,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
             responseFinish
           ) as AIResponseFinish;
           console.log("products", responseParse.products);
+
           if (responseParse.products.length === 0) {
             return endFlow("No hemos registrado ningun producto en tu pedido");
           }
@@ -160,6 +122,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           });
           return gotoFlow(finishOrderFlow);
         }
+        
         let sendMessage: any = responseParse.message.body;
         if (responseParse.message.media && responseParse.message.media !== "") {
           sendMessage = [
