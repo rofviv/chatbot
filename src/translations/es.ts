@@ -32,7 +32,7 @@ export default {
         address_fallback: "Por favor, responde con Si o No"
     },
     location: {
-        location_no_merchants: "No tenemos comercios disponibles en este momento, intenta más tarde",
+        location_no_merchants: "Uy! No encontramos ninguna sucursal cercana, intenta con otra ubicación",
         location_no_coverage: "Lamentamos que por el momento no estamos disponibles en tu zona, intenta más tarde",
         location_out_coverage: "Lo sentimos, no tenemos cobertura en tu ubicación",
         location_coverage: "Exelente, tenemos cobertura en tu zona, Que deseas pedir?"
