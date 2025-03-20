@@ -22,6 +22,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/pnpm-lock.yaml ./
 
 RUN mkdir -p /app/tmp && chmod 777 /app/tmp
+RUN mkdir -p /app/bot_sessions && chmod 777 /app/bot_sessions
 
 RUN corepack enable && \
     corepack prepare pnpm@latest --activate && \
@@ -30,6 +31,7 @@ RUN corepack enable && \
 EXPOSE 3000
 CMD ["pnpm", "start"]
 
+# mkdir -p /var/www/bot_sessions/kiky
 # sudo docker build -t chatbot-baileys .
 # sudo docker rm -f chatbot-kiky
-# sudo docker run -d -p 7000:3000 -e ENV_FILE=.env.kiky --env-file .env.kiky --name chatbot-kiky chatbot-baileys
+# sudo docker run -d -p 7000:3000 -e ENV_FILE=.env.kiky --env-file .env.kiky -v /var/www/bot_sessions/kiky:/app/bot_sessions --name chatbot-kiky chatbot-baileys

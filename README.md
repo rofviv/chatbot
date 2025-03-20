@@ -24,7 +24,8 @@ ENV_FILE=.env.{provider} pnpm run dev
 - Dont forget to create or change .env.{provider} with your new credentials
 
 ```bash
+mkdir -p /var/www/bot_sessions/{provider}
 sudo docker build -t chatbot-baileys .
 sudo docker rm -f chatbot-{provider}
-sudo docker run -d -p {port}:3000 -e ENV_FILE=.env.{provider} --env-file .env.{provider} --name chatbot-{provider} chatbot-baileys
+sudo docker run -d -p {port}:3000 -e ENV_FILE=.env.{provider} --env-file .env.{provider} -v /var/www/bot_sessions/{provider}:/app/bot_sessions --name chatbot-{provider} chatbot-baileys
 ```
