@@ -69,9 +69,6 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
             LocalStorage.clearOrderCurrent(state);
             return endFlow("Lo sentimos, no encontramos ninguna sucursal cercana. Puedes intentar con otra ubicación");
           }
-        } else {
-          LocalStorage.clearOrderCurrent(state);
-          return endFlow("Lo sentimos, no encontramos ninguna sucursal cercana. Puedes intentar con otra ubicación");
         }
 
         let deliveryCost = (await state.get("deliveryCost")) as number | undefined;
