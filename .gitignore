@@ -6,6 +6,7 @@ node_modules
 .env.kiky
 .env.wooky
 .env.pollos-lucho
+.env.marquesitas
 
 *_sessions
 *tokens
