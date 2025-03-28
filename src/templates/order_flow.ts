@@ -43,6 +43,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
         const menuProducts = ProductUtils.productsParseText(
           JSON.parse(menuGlobal as string)
         );
+        console.log("menuProducts", menuProducts);
         let newPrompt =
           prompt + "\nEl menu es: " + menuProducts + "\n" + promptFormat;
         let messages = [
