@@ -27,3 +27,10 @@ type ToppingAIResponse = {
   subToppingName: string;
   price: number;
 };
+
+export type MediaAssets = {
+  menu: {
+    body: string;
+    media: string;
+  }[];
+};

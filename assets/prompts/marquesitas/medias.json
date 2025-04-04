@@ -1,0 +1,12 @@
+{
+    "menu": [
+        {
+            "body": "Escoge tu marquesita",
+            "media": "https://storage-patiodriver.s3.amazonaws.com/marquesitas-menu1.webp"
+        },
+        {
+            "body": "Arma tu crunchy crepe",
+            "media": "https://storage-patiodriver.s3.amazonaws.com/marquesitas-menu2.webp"
+        }
+    ]
+}

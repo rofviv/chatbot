@@ -9,7 +9,7 @@ import { finishOrderFlow } from "./finish_order_flow";
 import LocalStorage from "~/services/local_storage";
 import ProductUtils from "~/utils/parse_products";
 import Utils from "~/utils/utils";
-import { AIResponse, AIResponseFinish } from "~/models/ai_flow.model";
+import { AIResponse, AIResponseFinish, MediaAssets } from "~/models/ai_flow.model";
 import { config } from "~/config";
 const pathPrompt = path.join(
   process.cwd(),
@@ -104,6 +104,22 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           return endFlow(responseParse.message.body || "No hay problema, espero que vuelvas pronto");
         }
 
+        if (responseParse.view_menu) {
+          try {
+            const pathMedia = path.join(
+              process.cwd(),
+              "assets/prompts", 
+              config.providerAssetsOrder,
+              "medias.json"
+            );
+            const mediaAsset = fs.readFileSync(pathMedia, "utf8");
+            const menuMedia = JSON.parse(mediaAsset) as MediaAssets;
+            await flowDynamic(menuMedia.menu);
+          } catch (err) {
+            // Menu empty
+          }
+        }
+
         if (responseParse.is_finish) {
           messages = [...messages, { role: "system", content: promptFinish }];
           const responseFinish = await AIService.chat(newPrompt, messages);
@@ -126,7 +142,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
           });
           return gotoFlow(finishOrderFlow);
         }
-        
+
         let sendMessage: any = responseParse.message.body;
         if (responseParse.message.media && responseParse.message.media !== "") {
           sendMessage = [

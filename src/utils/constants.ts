@@ -7,5 +7,5 @@ export default class Constants {
     "https://storage-patiodriver.s3.amazonaws.com/holapatio-logo.webp";
   static delayMessage = 2000;
   static createOrderMessage = "Quiero hacer un pedido, muestrame las categorias de productos del menu para que pueda hacer mi pedido";
-  static menuMessage = "Muestrame las categorias de productos del menu para que pueda elegir";
+  static menuMessage = "Quiero ver el menu, muestrame todas la opciones agrupadas por categorias";
 }
