@@ -82,7 +82,7 @@ export const orderFlow = addKeyword(EVENTS.ACTION).addAction(
             toLongitude: userAddress.longitude,
             returnRoute: 0,
             vehicleTypeId: Constants.vehicleType_motorcycle,
-            cityId: Constants.cityId_SC,
+            cityId: Constants.cityId_SC, // TODO: Change by cityId from user address
           });
           deliveryCost = res.baseCost ?? 0 + res.extraCost ?? 0;
           currency = res.currency;

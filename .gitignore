@@ -2,11 +2,7 @@ dist/*
 node_modules
 
 # Ignorar todos los archivos de ambiente
-.env
-.env.kiky
-.env.wooky
-.env.pollos-lucho
-.env.marquesitas
+.env*
 
 *_sessions
 *tokens
